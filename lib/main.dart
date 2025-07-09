@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:otpuivada/chat_list_page.dart';
 import 'data.dart';
 import 'home_screen.dart';
 import 'otp_login_page.dart';
@@ -76,14 +77,14 @@ class MyApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(body: Center(child: CircularProgressIndicator()));
           } else if (snapshot.hasData && snapshot.data == true) {
-            return HomeScreen();
+            return ChatListPage();
           } else {
             return OtpLoginPage();
           }
         },
       ),
       routes: {
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => ChatListPage(),
         '/login': (context) => OtpLoginPage(),
       },
     );
