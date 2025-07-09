@@ -40,6 +40,13 @@ dependencies:
   pinput: ^4.0.0
   sms_autofill: ^2.4.1
   permission_handler: ^12.0.1
+  flutter_chat_ui: ^1.6.10
+  flutter_chat_types: ^3.6.2
+  image_picker: ^1.0.7
+  google_mlkit_text_recognition: ^0.12.0
+  uuid: ^4.0.0
+  file_picker: ^6.1.1
+
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +74,7 @@ flutter:
   assets:
     - assets/empty_state.svg
     - assets/ChatGPT Image Jul 7, 2025, 03_58_36 AM.png
+    - assets/ChatGPT Image Jul 9, 2025, 03_19_02 AM.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
