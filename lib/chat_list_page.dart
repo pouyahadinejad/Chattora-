@@ -272,8 +272,10 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:otpuivada/auth_service.dart';
+import 'package:otpuivada/ocrpdf.dart';
 
 class ChatListPage extends StatefulWidget {
   @override
@@ -346,7 +348,7 @@ class _ChatListPageState extends State<ChatListPage> {
     }
   }
 
-  Future<void> sendMessage() async {
+  Future<void> sendMessage({required String text}) async {
     final text = messageController.text.trim();
     if (text.isEmpty) return;
 
@@ -371,6 +373,7 @@ class _ChatListPageState extends State<ChatListPage> {
         },
         body: jsonEncode({
           'body': text,
+          'title': 'آزمون آیلتس',
         }),
       );
 
@@ -482,49 +485,85 @@ class _ChatListPageState extends State<ChatListPage> {
                         },
                       ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: messageController,
-                    decoration: InputDecoration(
-                      hintText: 'پیام خود را بنویسید...',
-                      hintStyle: TextStyle(fontFamily: 'Vazir'),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: loading ? null : sendMessage,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: loading
-                      ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Icon(Icons.send, color: Colors.white),
-                ),
-              ],
+Padding(
+  padding: const EdgeInsets.all(12),
+  child: Row(
+    children: [
+      // IconButton(
+      //   icon: Icon(Icons.document_scanner),
+      //   color: Colors.green,
+      //   tooltip: 'ارسال متن از عکس یا PDF',
+      //   onPressed: () async {
+      //     final extractedText = await Navigator.push<String>(
+      //       context,
+      //       MaterialPageRoute(builder: (_) => OCRPdfApp()),
+      //     );
+
+      //     if (extractedText != null && extractedText.trim().isNotEmpty) {
+      //       messageController.text = extractedText;
+      //     }
+      //   },
+      // ),
+      Expanded(
+        child: TextField(
+          controller: messageController,
+          decoration: InputDecoration(
+            hintText: 'پیام خود را بنویسید...',
+            hintStyle: TextStyle(fontFamily: 'Vazir'),
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
             ),
-          )
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+        ),
+      ),
+      SizedBox(width: 8),
+            IconButton(
+        icon: Icon(Icons.document_scanner),
+        color: Colors.green,
+        tooltip: 'ارسال متن از عکس یا PDF',
+        onPressed: () async {
+          final extractedText = await Navigator.push<String>(
+            context,
+            MaterialPageRoute(builder: (_) => OCRPdfApp()),
+          );
+
+          if (extractedText != null && extractedText.trim().isNotEmpty) {
+            messageController.text = extractedText;
+          }
+        },
+      ),
+            ElevatedButton(
+          onPressed: loading
+              ? null
+              : () {
+                  sendMessage(text: '');
+                },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+          ),
+          child: loading
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Icon(Icons.send, color: Colors.white),
+        ),
+
+    ],
+  ),
+),
+
         ],
       ),
     );
