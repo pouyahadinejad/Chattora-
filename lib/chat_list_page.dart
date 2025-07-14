@@ -270,6 +270,30 @@
 
 
 
+
+
+
+
+
+
+
+
+
+///////////////////////=>nice
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
@@ -506,6 +530,10 @@ Padding(
       // ),
       Expanded(
         child: TextField(
+          expands: false,
+          textInputAction: TextInputAction.newline,
+          maxLines:3,
+          minLines: 1,
           controller: messageController,
           decoration: InputDecoration(
             hintText: 'پیام خود را بنویسید...',
@@ -1090,6 +1118,305 @@ Padding(
 //                 ),
 //               ),
 //             ),
+//     );
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+// import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+// import 'package:http/http.dart' as http;
+// import 'package:uuid/uuid.dart';
+// import 'package:otpuivada/auth_service.dart';
+// import 'package:otpuivada/ocrpdf.dart';
+
+// class ChatListPage extends StatefulWidget {
+//   @override
+//   State<ChatListPage> createState() => _ChatListPageState();
+// }
+
+// class _ChatListPageState extends State<ChatListPage> {
+//   List<types.Message> messages = [];
+//   bool loading = false;
+
+//   /// کاربر لاگین شده (خود ما)
+//   final types.User currentUser = types.User(id: '0'); // from==0 یعنی پیام خودمونه
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     checkLoginAndFetch();
+//   }
+
+//   Future<void> checkLoginAndFetch() async {
+//     if (!AuthService.isLoggedIn()) {
+//       Navigator.pushReplacementNamed(context, '/login');
+//       return;
+//     }
+//     await fetchChats();
+//   }
+
+//   Future<void> fetchChats() async {
+//     setState(() {
+//       loading = true;
+//     });
+
+//     final token = AuthService.getToken();
+//     if (token == null || token.isEmpty) {
+//       Navigator.pushReplacementNamed(context, '/login');
+//       return;
+//     }
+
+//     var url = Uri.parse(
+//         'https://chat.vsrv.ir/api/chats?package_name=com.vada.drive');
+
+//     try {
+//       var response = await http.get(
+//         url,
+//         headers: {
+//           'Accept': 'application/json',
+//           'Authorization': 'Bearer $token',
+//         },
+//       );
+
+//       if (response.statusCode == 200) {
+//         var data = jsonDecode(response.body);
+
+//         List<dynamic> rawMessages;
+//         if (data is List) {
+//           rawMessages = data;
+//         } else if (data is Map && data.containsKey('data')) {
+//           rawMessages = data['data'];
+//         } else {
+//           rawMessages = [];
+//         }
+// final loadedMessages = rawMessages
+//     .map<types.Message?>((item) {
+//       final body = (item['body'] ?? '').trim();
+//       if (body.isEmpty) return null;
+
+//       final isMine = item['from'] == 0;
+
+//       return types.TextMessage(
+//         id: const Uuid().v4(),
+//         author: isMine ? currentUser : types.User(id: '1'),
+//         createdAt: DateTime.now().millisecondsSinceEpoch,
+//         text: body,
+//       );
+//     })
+//     .whereType<types.Message>()
+//     .toList();
+
+
+//         setState(() {
+//           messages = loadedMessages.reversed.toList();
+//         });
+//       } else {
+//         print('Error loading chats: ${response.statusCode}');
+//       }
+//     } catch (e) {
+//       print('Error fetching chats: $e');
+//     } finally {
+//       setState(() {
+//         loading = false;
+//       });
+//     }
+//   }
+
+//   Future<void> sendMessage({required String text}) async {
+//     if (text.trim().isEmpty) return;
+
+//     setState(() {
+//       loading = true;
+//     });
+
+//     final token = AuthService.getToken();
+//     if (token == null || token.isEmpty) {
+//       Navigator.pushReplacementNamed(context, '/login');
+//       return;
+//     }
+
+//     var url = Uri.parse(
+//         'https://chat.vsrv.ir/api/chats?package_name=com.vada.drive');
+
+//     try {
+//       var response = await http.post(
+//         url,
+//         headers: {
+//           'Accept': 'application/json',
+//           'Content-Type': 'application/json',
+//           'Authorization': 'Bearer $token',
+//         },
+//         body: jsonEncode({
+//           'body': text,
+//           'title': 'آزمون آیلتس',
+//         }),
+//       );
+
+//       if (response.statusCode == 200) {
+//         var data = jsonDecode(response.body);
+
+//         if (data is List && data.isNotEmpty) {
+//           for (var item in data) {
+//             final body = (item['body'] ?? '').trim();
+//             if (body.isEmpty) continue;
+
+//             final isMine = item['from'] == 0;
+
+//             final msg = types.TextMessage(
+//               id: const Uuid().v4(),
+//               author: isMine ? currentUser : types.User(id: '1'),
+//               createdAt: DateTime.now().millisecondsSinceEpoch,
+//               text: body,
+//             );
+
+//             setState(() {
+//               messages.insert(0, msg);
+//             });
+//           }
+//         } else {
+//           await fetchChats();
+//         }
+//       } else {
+//         var data = jsonDecode(response.body);
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text(data['message'] ?? 'ارسال پیام ناموفق بود')),
+//         );
+//       }
+//     } catch (e) {
+//       print('Error sending message: $e');
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('خطا در ارسال پیام')),
+//       );
+//     } finally {
+//       setState(() {
+//         loading = false;
+//       });
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: Colors.green.shade50,
+//       appBar: AppBar(
+//         title: Text(
+//           "چت",
+//           style: TextStyle(fontFamily: 'Vazir'),
+//         ),
+//         backgroundColor: Colors.green,
+//         actions: [
+//           IconButton(
+//             icon: Icon(Icons.logout),
+//             onPressed: () async {
+//               await AuthService.clearToken();
+//               Navigator.pushReplacementNamed(context, '/login');
+//             },
+//           )
+//         ],
+//       ),
+//       body: loading
+//           ? Center(child: CircularProgressIndicator())
+//           : Chat(
+//               messages: messages,
+//               user: currentUser,
+//               theme: DefaultChatTheme(
+//                 inputBackgroundColor: Colors.white,
+//                 inputTextStyle: TextStyle(
+//                   fontFamily: 'Vazir',
+//                   fontSize: 16,
+//                 ),
+//                 primaryColor: Colors.green.shade600,
+//                 secondaryColor: Colors.green.shade100,
+//                 receivedMessageBodyTextStyle: TextStyle(
+//                   fontFamily: 'Vazir',
+//                   color: Colors.green.shade900,
+//                   fontSize: 16,
+//                 ),
+//                 sentMessageBodyTextStyle: TextStyle(
+//                   fontFamily: 'Vazir',
+//                   color: Colors.white,
+//                   fontSize: 16,
+//                 ),
+//               ),
+//               onSendPressed: (partialMessage) {
+//                 final text = (partialMessage as types.PartialText).text;
+//                 sendMessage(text: text);
+//               },
+//               customBottomWidget: _buildCustomInput(context),
+//             ),
+//     );
+//   }
+
+//   Widget _buildCustomInput(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+//       child: Row(
+//         children: [
+//           IconButton(
+//             icon: Icon(Icons.document_scanner, color: Colors.green),
+//             onPressed: () async {
+//               final extractedText = await Navigator.push<String>(
+//                 context,
+//                 MaterialPageRoute(builder: (_) => OCRPdfApp()),
+//               );
+
+//               if (extractedText != null && extractedText.trim().isNotEmpty) {
+//                 sendMessage(text: extractedText);
+//               }
+//             },
+//           ),
+//           Expanded(
+//             child: TextField(
+//               maxLines: 5,
+//               minLines: 1,
+//               textInputAction: TextInputAction.newline,
+//               decoration: InputDecoration(
+//                 hintText: 'پیام خود را بنویسید...',
+//                 hintStyle: TextStyle(fontFamily: 'Vazir'),
+//                 filled: true,
+//                 fillColor: Colors.white,
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(12),
+//                   borderSide: BorderSide.none,
+//                 ),
+//                 contentPadding:
+//                     EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+//               ),
+//               onSubmitted: (text) {
+//                 if (text.trim().isNotEmpty) {
+//                   sendMessage(text: text);
+//                 }
+//               },
+//             ),
+//           ),
+//           SizedBox(width: 8),
+//           loading
+//               ? CircularProgressIndicator(strokeWidth: 2)
+//               : IconButton(
+//                   icon: Icon(Icons.send, color: Colors.green),
+//                   onPressed: () {
+//                     // نیازی نیست اینجا چیزی بنویسی چون onSendPressed کارش رو میکنه
+//                   },
+//                 )
+//         ],
+//       ),
 //     );
 //   }
 // }

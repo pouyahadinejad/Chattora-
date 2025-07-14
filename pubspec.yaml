@@ -54,6 +54,7 @@ dependencies:
   
   
   
+  
 
 
 dev_dependencies:
@@ -80,9 +81,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/empty_state.svg
-    - assets/ChatGPT Image Jul 7, 2025, 03_58_36 AM.png
-    - assets/ChatGPT Image Jul 9, 2025, 03_19_02 AM.png
+    - assets/
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
