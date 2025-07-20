@@ -22,6 +22,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await Hive.openBox<String>('auth');
+  await Hive.openBox<String>('imageHistory');
 SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       statusBarColor:  Colors.green.shade50, // اینجا رنگ Status Bar
@@ -77,7 +78,7 @@ class MyApp extends StatelessWidget {
           } else {
             return OtpLoginPage();
           }
-        },
+        },  
       ),
       routes: {
         '/home': (context) => OCRPdfApp(),
