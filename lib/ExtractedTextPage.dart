@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:otpuivada/chat_list_page.dart';
 import 'package:otpuivada/home_screen.dart';
+import 'package:otpuivada/ocrpdf.dart';
 
 class ExtractedTextPage extends StatelessWidget {
   final String text;
