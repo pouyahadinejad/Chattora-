@@ -840,6 +840,128 @@
 // }
 //1.2
 
+// import 'dart:io';
+// import 'package:flutter/material.dart';
+// import 'package:otpuivada/storage_helper.dart';
+
+// class HistoryPage extends StatefulWidget {
+//   const HistoryPage({super.key});
+
+//   @override
+//   State<HistoryPage> createState() => _HistoryPageState();
+// }
+
+// class _HistoryPageState extends State<HistoryPage> {
+//   List<HistoryItem> items = [];
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _loadItems();
+//   }
+
+//   Future<void> _loadItems() async {
+//     final loadedItems = await HistoryStorage.getItems();
+//     setState(() {
+//       items = loadedItems;
+//     });
+//   }
+
+//   Future<void> _deleteItem(String imagePath) async {
+//     final confirmed = await showDialog<bool>(
+//       context: context,
+//       builder: (_) => AlertDialog(
+//         title: const Text('حذف'),
+//         content: const Text('آیا از حذف این مورد اطمینان دارید؟'),
+//         actions: [
+//           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('خیر')),
+//           TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('بله')),
+//         ],
+//       ),
+//     );
+
+//     if (confirmed == true) {
+//       await HistoryStorage.removeItem(imagePath);
+//       _loadItems();
+//     }
+//   }
+
+//   void _showDetails(HistoryItem item) {
+//     Navigator.push(
+//       context,
+//       MaterialPageRoute(
+//         builder: (_) => Scaffold(
+//           appBar: AppBar(title: const Text('نمایش چت'), backgroundColor: Colors.green),
+//           body: Padding(
+//             padding: const EdgeInsets.all(16),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 // if (item.imagePath.isNotEmpty && File(item.imagePath).existsSync())
+//                 //   Image.file(File(item.imagePath)),
+//                 const SizedBox(height: 16),
+//                 Text('سوال:', style: TextStyle(fontWeight: FontWeight.bold)),
+//                 Text(item.userMessage),
+//                 const SizedBox(height: 8),
+//                 Text('پاسخ:', style: TextStyle(fontWeight: FontWeight.bold)),
+//                 Text(item.chatResponse),
+//                 const SizedBox(height: 8),
+//                 Text('Chat ID: ${item.chatId}', style: TextStyle(color: Colors.grey)),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('تاریخچه'), backgroundColor: Colors.green),
+//       body: items.isEmpty
+//           ? const Center(child: Text('موردی ذخیره نشده.'))
+//           : ListView.builder(
+//               itemCount: items.length,
+//               itemBuilder: (context, index) {
+//                 final item = items[index];
+//                 return GestureDetector(
+//                   onTap: () => _showDetails(item),
+//                   child: Card(
+//                     margin: const EdgeInsets.all(8),
+//                     child: ListTile(
+//                       leading: item.imagePath.isNotEmpty && File(item.imagePath).existsSync()
+//                           ? GestureDetector(
+//                               onTap: () => _showDetails(item),
+//                               child: Image.file(
+//                                 File(item.imagePath),
+//                                 width: 80,
+//                                 height: 80,
+//                                 fit: BoxFit.cover,
+//                               ),
+//                             )
+//                           : const Icon(Icons.image_not_supported, size: 48),
+//                       title: Text(item.userMessage, maxLines: 1, overflow: TextOverflow.ellipsis),
+//                       subtitle: Text(item.chatResponse, maxLines: 2, overflow: TextOverflow.ellipsis),
+//                       trailing: IconButton(
+//                         icon: const Icon(Icons.delete, color: Colors.red),
+//                         onPressed: () => _deleteItem(item.imagePath),
+//                       ),
+//                     ),
+//                   ),
+//                 );
+//               },
+//             ),
+//     );
+//   }
+// }
+
+
+
+
+
+/////تست تصویر
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:otpuivada/storage_helper.dart';
@@ -867,47 +989,83 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
-  Future<void> _deleteItem(String imagePath) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('حذف'),
-        content: const Text('آیا از حذف این مورد اطمینان دارید؟'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('خیر')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('بله')),
-        ],
-      ),
-    );
+  // Future<void> _deleteItem(String imagePath) async {
+  //   final confirmed = await showDialog<bool>(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: const Text('حذف'),
+  //       content: const Text('آیا از حذف این مورد اطمینان دارید؟'),
+  //       actions: [
+  //         TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('خیر')),
+  //         TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('بله')),
+  //       ],
+  //     ),
+  //   );
 
-    if (confirmed == true) {
-      await HistoryStorage.removeItem(imagePath);
-      _loadItems();
-    }
+  //   if (confirmed == true) {
+  //     await HistoryStorage.removeItem(imagePath);
+  //     _loadItems();
+  //   }
+  // }
+  Future<void> _deleteItem(String imagePath) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text('حذف'),
+      content: const Text('آیا از حذف این مورد اطمینان دارید؟'),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('خیر')),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('بله')),
+      ],
+    ),
+  );
+
+  if (confirmed == true) {
+    // حذف از منبع داده ذخیره شده
+    await HistoryStorage.removeItem(imagePath);
+
+    // حذف از لیست داخل صفحه و به‌روزرسانی UI به صورت فوری
+    setState(() {
+      items.removeWhere((item) => item.imagePath == imagePath);
+    });
   }
+}
+
 
   void _showDetails(HistoryItem item) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(title: const Text('نمایش چت'), backgroundColor: Colors.green),
-          body: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // if (item.imagePath.isNotEmpty && File(item.imagePath).existsSync())
-                //   Image.file(File(item.imagePath)),
-                const SizedBox(height: 16),
-                Text('سوال:', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(item.userMessage),
-                const SizedBox(height: 8),
-                Text('پاسخ:', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(item.chatResponse),
-                const SizedBox(height: 8),
-                Text('Chat ID: ${item.chatId}', style: TextStyle(color: Colors.grey)),
-              ],
+        builder: (_) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: Scaffold(
+            appBar: AppBar(title: const Text('نمایش چت'), backgroundColor: Colors.green),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (item.imagePath.isNotEmpty && File(item.imagePath).existsSync())
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.file(
+                        File(item.imagePath),
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  const SizedBox(height: 20),
+                  const Text('سوال:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  const SizedBox(height: 6),
+                  Text(item.userMessage, style: TextStyle(fontSize: 16)),
+                  const SizedBox(height: 16),
+                  const Text('پاسخ:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  const SizedBox(height: 6),
+                  Text(item.chatResponse, style: TextStyle(fontSize: 16)),
+                  const SizedBox(height: 16),
+                  Text('Chat ID: ${item.chatId}', style: TextStyle(color: Colors.grey)),
+                ],
+              ),
             ),
           ),
         ),
@@ -917,41 +1075,97 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('تاریخچه'), backgroundColor: Colors.green),
-      body: items.isEmpty
-          ? const Center(child: Text('موردی ذخیره نشده.'))
-          : ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return GestureDetector(
-                  onTap: () => _showDetails(item),
-                  child: Card(
-                    margin: const EdgeInsets.all(8),
-                    child: ListTile(
-                      leading: item.imagePath.isNotEmpty && File(item.imagePath).existsSync()
-                          ? GestureDetector(
-                              onTap: () => _showDetails(item),
-                              child: Image.file(
-                                File(item.imagePath),
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.cover,
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(title: const Text('تاریخچه'), backgroundColor: Colors.green),
+        body: items.isEmpty
+            ? const Center(child: Text('موردی ذخیره نشده.', style: TextStyle(fontSize: 16)))
+            : ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => _showDetails(item),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // تصویر بالای کارت
+                            if (item.imagePath.isNotEmpty && File(item.imagePath).existsSync())
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(
+                                  File(item.imagePath),
+                                  width: double.infinity,
+                                  height: 180,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            else
+                              Container(
+                                height: 180,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(Icons.image_not_supported, size: 80, color: Colors.grey),
                               ),
-                            )
-                          : const Icon(Icons.image_not_supported, size: 48),
-                      title: Text(item.userMessage, maxLines: 1, overflow: TextOverflow.ellipsis),
-                      subtitle: Text(item.chatResponse, maxLines: 2, overflow: TextOverflow.ellipsis),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteItem(item.imagePath),
+                            
+                            const SizedBox(height: 12),
+      
+                            // متن سوال
+                            Text(
+                              'سوال:',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green.shade800),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              item.userMessage,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            
+                            const SizedBox(height: 10),
+      
+                            // متن پاسخ
+                            Text(
+                              'پاسخ:',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green.shade800),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              item.chatResponse,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                            ),
+      
+                            // دکمه حذف
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.redAccent),
+                                onPressed: () => _deleteItem(item.imagePath),
+                                tooltip: 'حذف مورد',
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              ),
+      ),
     );
   }
 }

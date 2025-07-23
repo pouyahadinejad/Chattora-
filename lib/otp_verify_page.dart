@@ -15,7 +15,7 @@ class OtpVerifyPage extends StatefulWidget {
   State<OtpVerifyPage> createState() => _OtpVerifyPageState();
 }
 
-class _OtpVerifyPageState extends State<OtpVerifyPage>
+class _OtpVerifyPageState extends State<OtpVerifyPage> 
     with CodeAutoFill, SingleTickerProviderStateMixin {
   final otpController = TextEditingController();
   bool loading = false;
@@ -182,41 +182,91 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
     }
   }
 
+  // Future<void> checkOtp() async {
+  //     final box = Hive.box<String>('auth');
+  //     final firstName = box.get('first_name');
+  //     final lastName = box.get('last_name');
+  //   if (otpController.text.length != 5) {
+  //     showSnack('لطفا کد را کامل وارد کنید');
+  //     return;
+  //   }
+
+  //   setState(() => loading = true);
+
+  //   var url = Uri.parse('https://payment.vada.ir/api/auth/check-otp');
+
+  //   try {
+  //     var response = await http.post(
+  //       url,
+  //       headers: {'Accept': 'application/json'},
+  //       body: {'mobile': widget.mobile, 'token': otpController.text},
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       var token = jsonDecode(response.body)['token'];
+  //       if (token != null) {
+  //         var box = Hive.box<String>('auth');
+  //         await box.put('token', token);
+  //         await box.put('mobile', widget.mobile);
+  //         Navigator.pushReplacementNamed(context, '/home');
+  //       }
+  //     } else {
+  //       var data = jsonDecode(response.body);
+  //       showSnack(data['message'] ?? 'کد نادرست است');
+  //     }
+  //   } catch (e) {
+  //     showSnack('خطا در ارتباط');
+  //   } finally {
+  //     setState(() => loading = false);
+  //   }
+  // }
   Future<void> checkOtp() async {
-    if (otpController.text.length != 5) {
-      showSnack('لطفا کد را کامل وارد کنید');
-      return;
-    }
+  if (otpController.text.length != 5) {
+    showSnack('لطفا کد را کامل وارد کنید');
+    return;
+  }
 
-    setState(() => loading = true);
+  setState(() => loading = true);
 
-    var url = Uri.parse('https://payment.vada.ir/api/auth/check-otp');
+  var url = Uri.parse('https://payment.vada.ir/api/auth/check-otp');
 
-    try {
-      var response = await http.post(
-        url,
-        headers: {'Accept': 'application/json'},
-        body: {'mobile': widget.mobile, 'token': otpController.text},
-      );
+  try {
+    var response = await http.post(
+      url,
+      headers: {'Accept': 'application/json'},
+      body: {'mobile': widget.mobile, 'token': otpController.text},
+    );
 
-      if (response.statusCode == 200) {
-        var token = jsonDecode(response.body)['token'];
-        if (token != null) {
-          var box = Hive.box<String>('auth');
-          await box.put('token', token);
-          await box.put('mobile', widget.mobile);
+    if (response.statusCode == 200) {
+      var token = jsonDecode(response.body)['token'];
+      if (token != null) {
+        var box = Hive.box<String>('auth');
+        await box.put('token', token);
+        await box.put('mobile', widget.mobile);
+
+        // چک کردن وجود اطلاعات نام و نام خانوادگی
+        final firstName = box.get('first_name');
+        final lastName = box.get('last_name');
+
+        if (firstName == null || lastName == null) {
+          // اگر اطلاعات نیست، میریم صفحه پر کردن اطلاعات
+          Navigator.pushReplacementNamed(context, '/userinfo');
+        } else {
+          // اطلاعات موجوده، میریم صفحه اصلی
           Navigator.pushReplacementNamed(context, '/home');
         }
-      } else {
-        var data = jsonDecode(response.body);
-        showSnack(data['message'] ?? 'کد نادرست است');
       }
-    } catch (e) {
-      showSnack('خطا در ارتباط');
-    } finally {
-      setState(() => loading = false);
+    } else {
+      var data = jsonDecode(response.body);
+      showSnack(data['message'] ?? 'کد نادرست است');
     }
+  } catch (e) {
+    showSnack('خطا در ارتباط');
+  } finally {
+    setState(() => loading = false);
   }
+}
+
 
   BoxDecoration glassBoxDecoration() {
     return BoxDecoration(

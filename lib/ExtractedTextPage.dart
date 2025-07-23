@@ -36,7 +36,7 @@ class ExtractedTextPage extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => ChatListPage(initialMessage:text ),
+                          builder: (_) => ChatListPage(initialMessage:text, imagePath: '', ),
                         ),
                       );
                     },
@@ -51,7 +51,7 @@ class ExtractedTextPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => EditTextPage(initialText: text),
+                          builder: (_) => EditTextPage(initialText: text, imagePath: '',),
                         ),
                       ).then((editedText) {
                         if (editedText != null) {

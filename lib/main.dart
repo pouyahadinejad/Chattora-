@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:otpuivada/UserInfoPage.dart';
 import 'package:otpuivada/chat_list_page.dart';
 import 'otp_login_page.dart';
 // import 'home_screen.dart';
@@ -83,6 +84,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (context) => OCRPdfApp(),
         '/login': (context) => OtpLoginPage(),
+        '/userinfo': (_) => const UserInfoPage(),
       },
     );
   }

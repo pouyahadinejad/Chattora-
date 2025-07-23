@@ -242,6 +242,8 @@ class HistoryStorage {
       }
     }
   }
+
+  static removeImage(String imagePath) {}
 }
 
 class HistoryItem {
