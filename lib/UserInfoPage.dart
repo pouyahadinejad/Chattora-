@@ -31,7 +31,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
       await box.put('first_name', _firstNameController.text.trim());
       await box.put('last_name', _lastNameController.text.trim());
 
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamedAndRemoveUntil(context, '/home',(route)=>false);
     }
   }
 

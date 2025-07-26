@@ -458,6 +458,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:otpuivada/drawer_widget.dart';
 // import 'package:otpuivada/chat_list_page.dart';
 import 'package:otpuivada/history_page.dart';
 // import 'package:otpuivada/storage_helper.dart';
@@ -465,6 +466,8 @@ import 'package:otpuivada/history_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:otpuivada/chat_list_page.dart';
+import 'package:sidebarx/sidebarx.dart';
 class OCRPdfApp extends StatefulWidget {
   final String? initialMessage;
   const OCRPdfApp({super.key, this.initialMessage});
@@ -475,12 +478,16 @@ class OCRPdfApp extends StatefulWidget {
 
 class _OCRPdfAppState extends State<OCRPdfApp> with SingleTickerProviderStateMixin {
   final TextEditingController messageController = TextEditingController();
+  
   String extractedText = '';
   bool isLoading = false;
   late AnimationController _controller; 
   late Animation<double> _fadeAnimation;
 
   final ImagePicker _picker = ImagePicker();
+  
+  get controller => SidebarXController(selectedIndex: 0, extended: true);
+  // final SidebarXController _controller = SidebarXController(selectedIndex: 0, extended: true);
 
   @override
   void initState() {
@@ -911,127 +918,254 @@ Widget build(BuildContext context) {
   final lastName = authBox.get('last_name') ?? '---';
   final fullName = '$firstName $lastName';
   final screenSize = MediaQuery.of(context).size;
+  // final SidebarXController _controller = SidebarXController(selectedIndex: 0, extended: true);
 
   return Directionality(
     textDirection: TextDirection.rtl,
-    child: Scaffold(
-      drawer: Drawer(
-        child: Column(
+    child: WillPopScope(
+       onWillPop: () async {
+      // مثلاً نمایش دیالوگ قبل از خروج
+      final shouldPop = await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('خروج'),
+          content: Text('آیا می‌خواهید از صفحه خارج شوید؟'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('خیر'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('بله'),
+            ),
+          ],
+        ),
+      );
+      return shouldPop ?? false;
+    },
+
+      child: Scaffold(
+        // drawer:DrawerWidget(
+        //     controller: _controller,
+        //     fullName: widget.fullName,
+        //   ),
+
+        drawer:  Row(
           children: [
-            Container(
-              width: double.infinity,
+            SidebarX(
+                  controller: controller,
+                  theme: SidebarXTheme(
+            width: 300, // ✅ عرض Drawer
+            margin: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.green.shade700,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            hoverColor: Colors.green.shade400,
+            textStyle: const TextStyle(
+              fontFamily: 'Vazir',
+              color: Colors.white,
+            ),
+            selectedTextStyle: const TextStyle(
+              fontFamily: 'Vazir',
+              color: Colors.black,
+            ),
+            selectedItemDecoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            iconTheme: const IconThemeData(color: Colors.white),
+            selectedIconTheme: const IconThemeData(color: Colors.black),
+                  ),
+                  extendedTheme: const SidebarXTheme(
+            width: 300, // ✅ عرض در حالت باز شده
+                  ),
+                  headerBuilder: (context, extended) {
+            return Padding(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: Colors.green.shade400),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                   const Icon(Icons.account_circle, size: 60, color: Colors.white),
                   const SizedBox(height: 16),
                   const Text(
                     'خوش آمدید',
-                    style: TextStyle(fontFamily: 'Vazir', fontSize: 18, color: Colors.white),
+                    style: TextStyle(
+                      fontFamily: 'Vazir',
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
                   ),
                   Text(
                     fullName,
-                    style: const TextStyle(fontFamily: 'Vazir', fontSize: 16, color: Colors.white70),
+                    style: const TextStyle(
+                      fontFamily: 'Vazir',
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
                   ),
                 ],
               ),
-            ),
-            const Spacer(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('خروج از حساب', style: TextStyle(fontFamily: 'Vazir')),
-              onTap: () async {
-                await AuthService.clearToken();
-                Navigator.pushReplacementNamed(context, '/login');
+            );
+                  },
+                  items: [
+            SidebarXItem(
+              icon: Icons.chat,
+              label: 'چت',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ChatListPage(imagePath: ''),
+                  ),
+                );
               },
             ),
-            const SizedBox(height: 12),
+            SidebarXItem(
+              icon: Icons.logout,
+              label: 'خروج',
+              onTap: () async {
+                await AuthService.clearToken();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
+              },
+            ),
+                  ],
+                ),
           ],
         ),
-      ),
+        // drawer: Drawer(
+          
+        //   child: Column(
+        //     children: [
+        //       Container(
+        //         width: double.infinity,
+        //         padding: const EdgeInsets.all(24),
+        //         decoration: BoxDecoration(color: Colors.green.shade400),
+        //         child: Column(
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           children: [
+        //             const SizedBox(height: 40),
+        //             const Icon(Icons.account_circle, size: 60, color: Colors.white),
+        //             const SizedBox(height: 16),
+        //             const Text(
+        //               'خوش آمدید',
+        //               style: TextStyle(fontFamily: 'Vazir', fontSize: 18, color: Colors.white),
+        //             ),
+        //             Text(
+        //               fullName,
+        //               style: const TextStyle(fontFamily: 'Vazir', fontSize: 16, color: Colors.white70),
+        //             ),
+        //             TextButton(onPressed: () {
+        //               // Navigator.popAndPushNamed(context, '/ChatListPage');
+        //                 Navigator.push(
+        //           context,
+        //           MaterialPageRoute(builder: (_) => const ChatListPage(imagePath: '',)),
+        //         );
 
-      backgroundColor: Colors.green.shade50,
-      appBar: AppBar(
-        automaticallyImplyLeading: true, // نمایش آیکون منو
-        backgroundColor: Colors.green,
-        title: const Text('پردازش OCR', style: TextStyle(fontFamily: 'Vazir', color: Colors.white)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const HistoryPage()),
-              );
-            },
-          ),
-        ],
-      ),
-
-      body: Column(
-        children: [
-          // 🟩 اطلاعات کاربر
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.all(12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.green.shade100,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+        //             }, child: Text('chat'))
+        //           ],
+        //         ),
+        //       ),
+        //       const Spacer(),
+        //       ListTile(
+        //         leading: const Icon(Icons.logout, color: Colors.red),
+        //         title: const Text('خروج از حساب', style: TextStyle(fontFamily: 'Vazir')),
+        //         onTap: () async {
+        //           await AuthService.clearToken();
+        //           Navigator.pushNamedAndRemoveUntil(context, '/login',(route)=>false);
+        //         },
+        //       ),
+        //       const SizedBox(height: 12),
+        //     ],
+        //   ),
+        // ),
+      
+        backgroundColor: Colors.green.shade50,
+        appBar: AppBar(
+          automaticallyImplyLeading: true, // نمایش آیکون منو
+          backgroundColor: Colors.green,
+          title: Center(child: const Text('پردازش OCR', style: TextStyle(fontFamily: 'Vazir', color: Colors.white))),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.history),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HistoryPage()),
+                );
+              },
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildInfoRow(Icons.phone_android, 'شماره موبایل: $mobileNumber'),
-                const SizedBox(height: 8),
-                _buildInfoRow(Icons.person, 'نام: $firstName'),
-                const SizedBox(height: 8),
-                _buildInfoRow(Icons.person_outline, 'نام خانوادگی: $lastName'),
-              ],
+          ],
+        ),
+      
+        body: Column(
+          children: [
+            // 🟩 اطلاعات کاربر
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green.shade100,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildInfoRow(Icons.phone_android, 'شماره موبایل: $mobileNumber'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow(Icons.person, 'نام: $firstName'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow(Icons.person_outline, 'نام خانوادگی: $lastName'),
+                ],
+              ),
             ),
-          ),
-
-          // 🟨 آپلود تصویر OCR
-          Expanded(
-            child: Center(
-              child: DottedBorder(
-                color: Colors.green,
-                strokeWidth: 1.5,
-                borderType: BorderType.RRect,
-                radius: const Radius.circular(30),
-                dashPattern: const [10, 6],
-                child: Container(
-                  width: screenSize.width * 0.9,
-                  height: screenSize.height * 0.7,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: showPickerDialog,
-                        child: SvgPicture.asset(
-                          'assets/document-upload.svg',
-                          width: 60,
-                          height: 60,
-                          color: Colors.green,
+              
+            // 🟨 آپلود تصویر OCR
+            Expanded(
+              child: Center(
+                child: DottedBorder(
+                  color: Colors.green,
+                  strokeWidth: 1.5,
+                  borderType: BorderType.RRect,
+                  radius: const Radius.circular(30),
+                  dashPattern: const [10, 6],
+                  child: Container(
+                    width: screenSize.width * 0.9,
+                    height: screenSize.height * 0.7,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: showPickerDialog,
+                          child: SvgPicture.asset(
+                            'assets/document-upload.svg',
+                            width: 60,
+                            height: 60,
+                            color: Colors.green,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text('آپلود تصویر سوال مورد نظر', style: TextStyle(fontFamily: 'Vazir')),
-                    ],
+                        const SizedBox(height: 12),
+                        const Text('آپلود تصویر سوال مورد نظر', style: TextStyle(fontFamily: 'Vazir')),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );

@@ -50,6 +50,7 @@ dependencies:
   pdf_render: ^1.4.12
   dotted_border: ^2.0.0
   shared_preferences: ^2.2.2
+  sidebarx: ^0.17.1
   
   
   

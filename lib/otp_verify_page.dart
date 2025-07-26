@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:otpuivada/UserInfoPage.dart';
 import 'package:pinput/pinput.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart';
@@ -250,10 +251,11 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
 
         if (firstName == null || lastName == null) {
           // اگر اطلاعات نیست، میریم صفحه پر کردن اطلاعات
-          Navigator.pushReplacementNamed(context, '/userinfo');
+          // Navigator.pushReplacementNamed(context, '/userinfo');
+          Navigator.pushNamedAndRemoveUntil(context, '/userinfo', (route)=>false);
         } else {
           // اطلاعات موجوده، میریم صفحه اصلی
-          Navigator.pushReplacementNamed(context, '/home');
+          Navigator.pushNamedAndRemoveUntil(context, '/home',(route)=>false);
         }
       }
     } else {
