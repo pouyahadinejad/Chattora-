@@ -8,7 +8,7 @@ import 'package:otpuivada/ocrpdf.dart';
 class ExtractedTextPage extends StatelessWidget {
   final String text;
 
-  const ExtractedTextPage({super.key, required this.text});
+  const ExtractedTextPage({super.key, required this.text, required imagePath});
 
   @override
   Widget build(BuildContext context) {

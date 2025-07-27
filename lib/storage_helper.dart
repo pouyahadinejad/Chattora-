@@ -204,7 +204,7 @@ class HistoryStorage {
       imagePath: imagePath,
       userMessage: '',
       chatResponse: '',
-      chatId: '',
+      chatId: '', time: '',
     );
     await addItem(item);
   }
@@ -244,6 +244,8 @@ class HistoryStorage {
   }
 
   static removeImage(String imagePath) {}
+
+  static clearAll() {}
 }
 
 class HistoryItem {
@@ -251,8 +253,12 @@ class HistoryItem {
   final String userMessage;
   final String chatResponse;
   final String chatId; // اضافه شده
+  final String time; // یا date یا createdAt و غیره
+// dateFormat.format(DateTime.parse(item.time))
+
 
   HistoryItem({
+    required this.time,
     required this.imagePath,
     required this.userMessage,
     required this.chatResponse,
@@ -271,7 +277,15 @@ class HistoryItem {
         userMessage: json['userMessage'] ?? '',
         chatResponse: json['chatResponse'] ?? '',
         chatId: json['chatId'] ?? '',
+         time: json['time']??'',
       );
+
+  // String get timestamp => null;
+  
+
+  // String get timestamp => null;
+
+  // String get timestamp => null;
 
   String toJsonString() => jsonEncode(toJson());
 
