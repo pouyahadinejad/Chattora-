@@ -18,7 +18,7 @@ class ChatListPage extends StatefulWidget {
 
   const ChatListPage({
     Key? key,
-    this.initialMessage,
+    this.initialMessage,     
     required this.imagePath,
   }) : super(key: key);
 
@@ -36,37 +36,27 @@ class _ChatListPageState extends State<ChatListPage> {
   bool _showScrollToBottomButton = false;
   final types.User _user = const types.User(id: 'user');
   final types.User _bot = const types.User(id: 'bot');
-
-  @override
-  void initState() {
-    if (widget.initialMessage != null && widget.initialMessage!.trim().isNotEmpty) {
-  final text = widget.initialMessage!.trim();
-  messageController.text = text;
-
-  // به‌جای ارسال مستقیم، از تابع کامل استفاده کن:
-  Future.microtask(() {
-    _handleSendPressed(types.PartialText(text: text));
-  });
-}
-
-    _scrollController = AutoScrollController();
-    super.initState();
-    _scrollController.addListener(_handleScrollPosition);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await loadSentMessageCount();
-      await loadMessagesFromLocal();
-      checkLoginAndFetch();
-    });
-
+  ////////////////////////
+@override
+void initState() {
+  _scrollController = AutoScrollController();
+  super.initState();
+  _scrollController.addListener(_handleScrollPosition);
+  
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await loadSentMessageCount();
+    await loadMessagesFromLocal();
+    checkLoginAndFetch();
+    
+    // این بخش را فقط یک بار و با تاخیر اجرا کنید
     if (widget.initialMessage != null && widget.initialMessage!.trim().isNotEmpty) {
       final text = widget.initialMessage!.trim();
       messageController.text = text;
-Future.microtask(() {
-  _handleSendPressed(types.PartialText(text: text));
-});
-
+      await Future.delayed(const Duration(milliseconds: 300));
+      _handleSendPressed(types.PartialText(text: text));
     }
-  }
+  });
+}
 
   @override
   void dispose() {
@@ -74,7 +64,7 @@ Future.microtask(() {
     messageController.dispose();
     super.dispose();
   }
-
+////////////////////////////
   void _scrollToBottom() {
     if (_scrollController.hasClients && messages.isNotEmpty) {
       _scrollController.scrollToIndex(
@@ -201,30 +191,29 @@ Start answering now.
     sendMessage(text: message.text);
   }
 
-  Future<void> sendMessage({required String text}) async {
-    final messageText = text.trim();
-    if (messageText.isEmpty) return;
-    
+    Future<void> sendMessage({required String text}) async {
+      final messageText = text.trim();
+      if (messageText.isEmpty) return;
 
-    if (sentMessageCount >= maxFreeMessages) {
-      showUpgradeDialog();
-      return;
-    }
+      if (loading) return;
+
+      if (sentMessageCount >= maxFreeMessages) {
+        showUpgradeDialog();
+        return;
+      }
 
     setState(() => loading = true);
 
-    final userMessage = types.TextMessage(
-      author: _user,
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-      id: 'user_${DateTime.now().millisecondsSinceEpoch}',
-      text: messageText,
-    );
+  final userMessage = types.TextMessage(
+    author: _user,
+    createdAt: DateTime.now().millisecondsSinceEpoch,
+    id: 'user_${DateTime.now().millisecondsSinceEpoch}',
+    text: messageText,
+  );
 
-    setState(() {
-      messages = [userMessage, ...messages];
-
-
-    });
+  setState(() {
+    messages = [userMessage, ...messages];
+  });
     
     _scrollToBottom();
 
@@ -337,172 +326,278 @@ Start answering now.
     );
   }
 
+  // void showRemainingMessagesDialog() {
+  //   final remaining = maxFreeMessages - sentMessageCount;
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: Text('اطلاعات اشتراک'),
+  //       content: Text(
+  //         remaining > 0
+  //             ? 'شما $remaining پیام رایگان دیگر دارید.'
+  //             : 'پیام‌های رایگان شما تمام شده است.',
+  //         style: TextStyle(fontFamily: 'Vazir'),
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: Text('باشه'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   void showRemainingMessagesDialog() {
-    final remaining = maxFreeMessages - sentMessageCount;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text('اطلاعات اشتراک'),
-        content: Text(
-          remaining > 0
-              ? 'شما $remaining پیام رایگان دیگر دارید.'
-              : 'پیام‌های رایگان شما تمام شده است.',
-          style: TextStyle(fontFamily: 'Vazir'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('باشه'),
+  final remaining = maxFreeMessages - sentMessageCount;
+
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (_) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: Colors.white,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.workspace_premium, color: Colors.amber, size: 28),
+          SizedBox(width: 8),
+          Text(
+            'اطلاعات اشتراک',
+            style: TextStyle(
+              fontFamily: 'Vazir',
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
         ],
       ),
-    );
-  }
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            remaining > 0 ? Icons.check_circle : Icons.block,
+            color: remaining > 0 ? Colors.green : Colors.red,
+            size: 48,
+          ),
+          SizedBox(height: 16),
+          Text(
+            remaining > 0
+                ? 'شما $remaining پیام رایگان دیگر دارید'
+                : 'پیام‌های رایگان شما تمام شده است.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Vazir',
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Center(
+            child: Text(
+              'باشه',
+              style: TextStyle(
+                fontFamily: 'Vazir',
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text("چت", style: TextStyle(fontFamily: 'Vazir')),
-        backgroundColor: Colors.green,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () async {
-              await AuthService.clearToken();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.workspace_premium),
-            tooltip: 'اطلاعات اشتراک',
-            onPressed: showRemainingMessagesDialog,
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Directionality(
-                textDirection: TextDirection.ltr,
-                child: Chat(
-                  messages: messages,
-                     // messages: messages.reversed.toList(),
-                  onSendPressed: _handleSendPressed,
-                  user: _user,
-                  scrollController: _scrollController,
-                  scrollPhysics: const BouncingScrollPhysics(),
-                  theme: DefaultChatTheme(
-                    primaryColor: Colors.green,
-                    secondaryColor: Colors.green.shade100,
-                    inputBackgroundColor: Colors.white,
-                    inputTextColor: Colors.black,
-                    inputTextDecoration: InputDecoration(
-                      hintText: 'پیام خود را بنویسید...',
-                      hintStyle: TextStyle(fontFamily: 'Vazir'),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                    ),
-                    backgroundColor: Colors.white,
-                    receivedMessageBodyTextStyle: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Vazir',
-                      fontSize: 16,
-                    ),
-                    sentMessageBodyTextStyle: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Vazir',
-                      fontSize: 16,
-                    ),
-                    // receivedMessageBodyColor: Colors.grey.shade200,
-                    // sentMessageBodyColor: Colors.green,
-                    // borderRadius: 12,
-                  ),
-                  customBottomWidget: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: messageController,
-                            decoration: InputDecoration(
-                              hintText: 'پیام خود را بنویسید...',
-                              hintStyle: TextStyle(fontFamily: 'Vazir'),
-                              filled: true,
-                              fillColor: Colors.grey.shade100,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        IconButton(
-                          icon: Icon(Icons.document_scanner),
-                          color: Colors.green,
-                          tooltip: 'ارسال متن از عکس یا PDF',
-                          onPressed: () async {
-                            final extractedText = await Navigator.push<String>(
-                              context,
-                              MaterialPageRoute(builder: (_) => OCRPdfApp()),
-                            );
-
-                            if (extractedText != null && extractedText.trim().isNotEmpty) {
-                              messageController.text = extractedText;
-                            }
-                          },
-                        ),
-                        ElevatedButton(
-                          onPressed: loading
-                              ? null
-                              : () {
-                                  sendMessage(text: messageController.text);
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: loading
-                              ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Icon(Icons.send, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+    return WillPopScope(
+         onWillPop: () async => false, // یعنی نذار بک بزنن
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          //   leading: IconButton(
+          //   icon: Icon(Icons.arrow_back),
+          //   onPressed: () {
+          //     Navigator.pop(context);
+          //   },
+          // ),
+          automaticallyImplyLeading: false,
+          title: Text("چت", style: TextStyle(fontFamily: 'Vazir')),
+          backgroundColor: Colors.green,
+          actions: [
+            // IconButton(
+            //   icon: Icon(Icons.logout),
+            //   onPressed: () async {
+            //     await AuthService.clearToken();
+            //     Navigator.pushReplacementNamed(context, '/login');
+            //   },
+            // ),
+            IconButton(
+              icon: Icon(Icons.workspace_premium),
+              tooltip: 'اطلاعات اشتراک',
+              onPressed: showRemainingMessagesDialog,
             ),
-            if (_showScrollToBottomButton)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 80),
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: FloatingActionButton(
-                    mini: true,
-                    backgroundColor: Colors.green,
-                    child: Icon(Icons.arrow_downward, color: Colors.white),
-                    onPressed: _scrollToBottom,
-                  ),
-                ),
-              ),
           ],
+        ),
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                    child: Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: Chat(
+                        messages: messages,
+                           // messages: messages.reversed.toList(),
+                        onSendPressed: _handleSendPressed,
+                        user: _user,
+                        scrollController: _scrollController,
+                        scrollPhysics: const BouncingScrollPhysics(),
+                        theme: DefaultChatTheme(
+                          primaryColor: Colors.green,
+                          secondaryColor: Colors.green.shade100,
+                          inputBackgroundColor: Colors.white,
+                          inputTextColor: Colors.black,
+                          inputTextDecoration: InputDecoration(
+                            hintText: 'پیام خود را بنویسید...',
+                            hintStyle: TextStyle(fontFamily: 'Vazir'),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          backgroundColor: Colors.white,
+                          receivedMessageBodyTextStyle: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Vazir',
+                            fontSize: 16,
+                          ),
+                          sentMessageBodyTextStyle: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Vazir',
+                            fontSize: 16,
+                          ),
+                          // receivedMessageBodyColor: Colors.grey.shade200,
+                          // sentMessageBodyColor: Colors.green,
+                          // borderRadius: 12,
+                        ),
+                        customBottomWidget: Container(
+                          color: Colors.white,
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: messageController,
+                                  decoration: InputDecoration(
+                                    hintText: 'پیام خود را بنویسید...',
+                                    hintStyle: TextStyle(fontFamily: 'Vazir'),
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              IconButton(
+                                icon: Icon(Icons.document_scanner),
+                                color: Colors.green,
+                                tooltip: 'ارسال متن از عکس یا PDF',
+                                onPressed: () async {
+                                  final extractedText = await Navigator.push<String>(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => OCRPdfApp()),
+                                  );
+                    
+                    
+                                    if (extractedText != null && extractedText.trim().isNotEmpty) {
+                                    // messageController.text = extractedText;
+                                     setState(() {
+                                      messageController.text = extractedText;
+                                       final ocrMessage = types.TextMessage(
+                                        author: _user,
+                                        createdAt: DateTime.now().millisecondsSinceEpoch,
+                                        id: 'ocr_${DateTime.now().millisecondsSinceEpoch}',
+                                        text: extractedText,
+                                      );
+                                      messages = [ocrMessage, ...messages];
+                                    });
+                                  }},),
+                                  
+                                
+                              
+                              ElevatedButton(
+                                onPressed: loading
+                                    ? null
+                                    : () {
+                                        sendMessage(text: messageController.text);
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: loading
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : Icon(Icons.send, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // if (_showScrollToBottomButton)
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(bottom: 80),
+                  //     child: Align(
+                  //       alignment: Alignment.bottomRight
+                  //       ,
+                  //       child: FloatingActionButton(
+                  //         mini: true,
+                  //         backgroundColor: Colors.green,
+                  //         child: Icon(Icons.arrow_downward, color: Colors.white),
+                  //         onPressed: _scrollToBottom,
+                  //       ),
+                  //     ),
+                  //   ),
+                ],
+              ),
+                    if (_showScrollToBottomButton)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 90,right: 18),
+                      // padding: EdgeInsets.all(80),
+                      child: Align(
+                        alignment: Alignment.bottomRight
+                        ,
+                        child: FloatingActionButton(
+                          // mini: true,
+                          backgroundColor: Colors.green,
+                          child: Icon(Icons.arrow_downward, color: Colors.white),
+                          onPressed: _scrollToBottom,
+                        ),
+                      ),
+                    ),
+            ],
+          ),
         ),
       ),
     );
