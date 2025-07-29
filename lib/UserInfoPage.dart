@@ -42,7 +42,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: const Text('اطلاعات کاربر', style: TextStyle(fontFamily: 'Vazir')),
+          title: const Text('اطلاعات کاربر', style: TextStyle(fontFamily: 'Kalameh')),
           centerTitle: true,
           backgroundColor: Colors.green,
         ),
@@ -73,7 +73,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         'لطفاً نام و نام خانوادگی خود را وارد کنید',
                         style: TextStyle(
                           fontSize: 14,
-                          fontFamily: 'Vazir',
+                          fontFamily: 'Kalameh',
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -99,7 +99,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             backgroundColor: primaryGreen,
                           ),
-                          child: const Text('ثبت و ادامه', style: TextStyle(fontFamily: 'Vazir', fontSize: 16,color: Colors.black)),
+                          child: const Text('ثبت و ادامه', style: TextStyle(fontFamily: 'Kalameh', fontSize: 16,color: Colors.black)),
                         ),
                       ),
                     ],
@@ -116,7 +116,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(fontFamily: 'Vazir'),
+      labelStyle: const TextStyle(fontFamily: 'Kalameh'),
       filled: true,
       fillColor: Colors.white.withOpacity(0.8),
       border: OutlineInputBorder(

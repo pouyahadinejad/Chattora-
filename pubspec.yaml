@@ -54,6 +54,10 @@ dependencies:
   loading_animation_widget: ^1.3.0
   flutter_staggered_animations: ^1.1.0
   scroll_to_index: ^3.0.0
+  # flutter_glass_morphism: ^1.0.1
+  glassmorphism: ^3.0.0
+  salomon_bottom_bar: ^3.3.1
+  flutter_localization: ^0.3.3
 
   
   
@@ -103,10 +107,10 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Vazir
+    - family: Kalameh
       fonts:
-        - asset: assets/fonts/Vazirmatn-ExtraLight.ttf
-        # - asset: assets/fonts/Vazirmatn-Bold.ttf
+        - asset: assets/fonts/kalameh-black.ttf
+        - asset: assets/fonts/kalameh-regular.ttf
         
           # style: italic
   #   - family: Trajan Pro

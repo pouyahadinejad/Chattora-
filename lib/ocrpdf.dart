@@ -2,7 +2,7 @@ import 'package:otpuivada/auth_service.dart';
 import 'package:otpuivada/chat_list_page.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       title: 'OCR پردازشگر',
       theme: ThemeData(
         primarySwatch: Colors.green,
-        fontFamily: 'Vazir',
+        fontFamily: 'Kalameh',
         scaffoldBackgroundColor: const Color(0xFFF1F8E9),
         appBarTheme: const AppBarTheme(
           elevation: 4,
@@ -62,6 +62,8 @@ class OCRPdfApp extends StatefulWidget {
 
 class _OCRPdfAppState extends State<OCRPdfApp> with SingleTickerProviderStateMixin {
   final TextEditingController messageController = TextEditingController();
+  int _selectedIndex =0;
+  int _currentIndex = 0;
   bool isloading = false;
   String extractedText = '';
   bool isLoading = false;
@@ -114,6 +116,101 @@ class _OCRPdfAppState extends State<OCRPdfApp> with SingleTickerProviderStateMix
       }
     }
   }
+  
+  // این متدها را به کلاس _OCRPdfAppState اضافه کنید
+Widget _buildCurrentPage() {
+  if (isLoading) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          LoadingAnimationWidget.staggeredDotsWave(
+            color: primaryColor,
+            size: 80,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'در حال پردازش تصویر...',
+            style: TextStyle(
+              fontFamily: 'Kalameh',
+              color: primaryColor,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  switch (_currentIndex) {
+    case 0:
+      return Column(
+        children: [
+          _buildUserInfoCard(
+            Hive.box<String>('auth').get('mobile') ?? 'نامشخص',
+            Hive.box<String>('auth').get('first_name') ?? '---',
+            Hive.box<String>('auth').get('last_name') ?? '---',
+          ),
+          _buildUploadSection(),
+        ],
+      );
+    case 1:
+      return const HistoryPage();
+    case 2:
+      return const ChatListPage(imagePath: '');
+    default:
+      return Container();
+  }
+}
+
+Widget _buildBottomNavigationBar() {
+  return Directionality(
+    textDirection: TextDirection.rtl,
+    child: Container(
+      height: 80,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _BottomNavItem(
+            icon: Icons.home_outlined,
+            activeIcon: Icons.home_rounded,
+            label: 'خانه',
+            isActive: _currentIndex == 0,
+            onTap: () => setState(() => _currentIndex = 0),
+            primaryColor: primaryColor,
+          ),
+          _BottomNavItem(
+            icon: Icons.history,
+            activeIcon: Icons.history_rounded,
+            label: 'تاریخچه',
+            isActive: _currentIndex == 1,
+            onTap: () => setState(() => _currentIndex = 1),
+            primaryColor: primaryColor,
+          ),
+          _BottomNavItem(
+            icon: Icons.chat_bubble_outline,
+            activeIcon: Icons.chat_rounded,
+            label: 'چت',
+            isActive: _currentIndex == 2,
+            onTap: () => setState(() => _currentIndex = 2),
+            primaryColor: primaryColor,
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   Future<void> processImage(File file, String imagePath) async {
     final inputImage = InputImage.fromFile(file);
@@ -214,9 +311,9 @@ class _OCRPdfAppState extends State<OCRPdfApp> with SingleTickerProviderStateMix
                 child: Text(
                   'انتخاب منبع تصویر',
                   style: TextStyle(
-                    fontFamily: 'Vazir',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Kalameh',
+                    fontSize: 16,
+                    // fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                 ),
@@ -256,7 +353,7 @@ class _OCRPdfAppState extends State<OCRPdfApp> with SingleTickerProviderStateMix
                   child: const Text(
                     "انصراف",
                     style: TextStyle(
-                      fontFamily: 'Vazir',
+                      fontFamily: 'Kalameh',
                       fontSize: 16,
                     ),
                   ),
@@ -289,7 +386,7 @@ Widget _buildOptionItem({
     title: Text(
       title,
       style: const TextStyle(
-        fontFamily: 'Vazir',
+        fontFamily: 'Kalameh',
         fontSize: 16,
       ),
     ),
@@ -307,17 +404,17 @@ Future<void> _handleImageSelection(ImageSource source) async {
     return await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('خروج', style: TextStyle(fontFamily: 'Vazir')),
-        content: const Text('آیا می‌خواهید از برنامه خارج شوید؟', style: TextStyle(fontFamily: 'Vazir')),
+        title: const Text('خروج', style: TextStyle(fontFamily: 'Kalameh')),
+        content: const Text('آیا می‌خواهید از برنامه خارج شوید؟', style: TextStyle(fontFamily: 'Kalameh')),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('خیر', style: TextStyle(fontFamily: 'Vazir')),
+            child: const Text('خیر', style: TextStyle(fontFamily: 'Kalameh')),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('بله', style: TextStyle(fontFamily: 'Vazir')),
+            child: const Text('بله', style: TextStyle(fontFamily: 'Kalameh')),
           ),
         ],
       ),
@@ -344,13 +441,13 @@ Future<void> _handleImageSelection(ImageSource source) async {
       ),
       hoverColor: Colors.white.withOpacity(0.2),
       textStyle: TextStyle(
-        fontFamily: 'Vazir',
+        fontFamily: 'Kalameh',
         color: Colors.white,
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
       selectedTextStyle: TextStyle(
-        fontFamily: 'Vazir',
+        fontFamily: 'Kalameh',
         color: primaryColor,
         fontSize: 14,
         fontWeight: FontWeight.bold,
@@ -396,7 +493,7 @@ Future<void> _handleImageSelection(ImageSource source) async {
             Text(
               'خوش آمدید',
               style: TextStyle(
-                fontFamily: 'Vazir',
+                fontFamily: 'Kalameh',
                 fontSize: 18,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -406,7 +503,7 @@ Future<void> _handleImageSelection(ImageSource source) async {
             Text(
               fullName,
               style: TextStyle(
-                fontFamily: 'Vazir',
+                fontFamily: 'Kalameh',
                 fontSize: 14,
                 color: Colors.white.withOpacity(0.9),
               ),
@@ -475,9 +572,9 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text('تایید خروج', style: TextStyle(fontFamily: 'Vazir')),
+      title: Text('تایید خروج', style: TextStyle(fontFamily: 'Kalameh')),
       content: Text('آیا مطمئن هستید که می‌خواهید خارج شوید؟', 
-               style: TextStyle(fontFamily: 'Vazir')),
+               style: TextStyle(fontFamily: 'Kalameh')),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
@@ -521,7 +618,7 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
           Text(
             'پروفایل کاربری',
             style: TextStyle(
-              fontFamily: 'Vazir',
+              fontFamily: 'Kalameh',
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: primaryColor,
@@ -547,8 +644,8 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
               borderType: BorderType.RRect,
               radius: Radius.circular(16), 
               color: primaryColor,         // رنگ نقطه‌ها
-              dashPattern: [6, 3],         // اندازه نقطه‌ها و فاصله بینشون
-              strokeWidth: 1,              
+              dashPattern: [6, 4],         // اندازه نقطه‌ها و فاصله بینشون
+              strokeWidth: 2,              
             child: Container(
               width: MediaQuery.of(context).size.width * 0.9,
               height: MediaQuery.of(context).size.height * 0.4,
@@ -583,7 +680,7 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
                   Text(
                     'برای آپلود تصویر کلیک کنید',
                     style: TextStyle(
-                      fontFamily: 'Vazir',
+                      fontFamily: 'Kalameh',
                       fontSize: 16,
                       color: textColor.withOpacity(0.8),
                     ),
@@ -592,7 +689,7 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
                   Text(
                     'فرمت‌های پشتیبانی شده: JPG, PNG',
                     style: TextStyle(
-                      fontFamily: 'Vazir',
+                      fontFamily: 'Kalameh',
                       fontSize: 12,
                       color: Colors.grey.shade600,
                     ),
@@ -605,7 +702,7 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
       ),
     );
   }
-
+   
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
@@ -613,84 +710,138 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
         const SizedBox(width: 8),
         Text(
           text,
-          style: TextStyle(fontFamily: 'Vazir', fontSize: 14, color: textColor),
+          style: TextStyle(fontFamily: 'Kalameh', fontSize: 14, color: textColor),
         ),
       ],
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final Box<String> authBox = Hive.box<String>('auth');
-    final mobileNumber = authBox.get('mobile') ?? 'نامشخص';
-    final firstName = authBox.get('first_name') ?? '---';
-    final lastName = authBox.get('last_name') ?? '---';
-    final fullName = '$firstName $lastName';
+  // @override
+  // Widget build(BuildContext context) {
+  //   final Box<String> authBox = Hive.box<String>('auth');
+  //   final mobileNumber = authBox.get('mobile') ?? 'نامشخص';
+  //   final firstName = authBox.get('first_name') ?? '---';
+  //   final lastName = authBox.get('last_name') ?? '---';
+  //   final fullName = '$firstName $lastName';
 
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: WillPopScope(
-        onWillPop: () => _showExitDialog(context),
-        child: Scaffold(
-          drawer: _buildSidebar(context, fullName, primaryColor),
-          backgroundColor: backgroundColor,
-          appBar: AppBar(
-            automaticallyImplyLeading: true,
-            backgroundColor: primaryColor,
-            title: const Center(
-              child: Text(
-                'پردازش OCR',
-                style: TextStyle(
-                  fontFamily: 'Vazir',
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+  //   return Directionality(
+  //     textDirection: TextDirection.rtl,
+  //     child: WillPopScope(
+  //       onWillPop: () => _showExitDialog(context),
+  //       child: Scaffold(
+  //         drawer: _buildSidebar(context, fullName, primaryColor),
+  //         backgroundColor: backgroundColor,
+  //         appBar: AppBar(
+  //           automaticallyImplyLeading: true,
+  //           backgroundColor: primaryColor,
+  //           title: const Center(
+  //             child: Text(
+  //               'پردازش OCR',
+  //               style: TextStyle(
+  //                 fontFamily: 'Vazir',
+  //                 color: Colors.white,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //           ),
+  //           //هم رنگ appbar
+  //           actions: [
+  //             IconButton(
+  //               icon: const Icon(Icons.history, size: 28,color: Colors.transparent,),
+  //               onPressed: () => Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(builder: (_) => const HistoryPage()),
+  //               ),
+  //             ),
+  //           ],
+
+  //           // actions: [Container()],
+  //         ),
+  //           body: _buildCurrentPage(),
+  //           bottomNavigationBar: _buildBottomNavigationBar(),
+          
+  //         // body: isLoading
+  //         //     ? Center(
+  //         //         child: Column(
+  //         //           mainAxisAlignment: MainAxisAlignment.center,
+  //         //           children: [
+  //         //             LoadingAnimationWidget.staggeredDotsWave(
+  //         //               color: primaryColor,
+  //         //               size: 80,
+  //         //             ),
+  //         //             const SizedBox(height: 20),
+  //         //             Text(
+  //         //               'در حال پردازش تصویر...',
+  //         //               style: TextStyle(
+  //         //                 fontFamily: 'Vazir',
+  //         //                 color: primaryColor,
+  //         //                 fontSize: 16,
+  //         //               ),
+  //         //             ),
+  //         //           ],
+  //         //         ),
+  //         //       )
+  //         //     : Column(
+  //         //         children: [
+  //         //           _buildUserInfoCard(mobileNumber, firstName, lastName),
+  //         //           _buildUploadSection(),
+  //         //         ],
+  //         //       ),
+  //       ),
+  //     ),
+  //   );
+  // }
+  @override
+Widget build(BuildContext context) {
+  final Box<String> authBox = Hive.box<String>('auth');
+  final mobileNumber = authBox.get('mobile') ?? 'نامشخص';
+  final firstName = authBox.get('first_name') ?? '---';
+  final lastName = authBox.get('last_name') ?? '---';
+  final fullName = '$firstName $lastName';
+
+  return Directionality(
+    textDirection: TextDirection.rtl,
+    child: WillPopScope(
+      onWillPop: () => _showExitDialog(context),
+      child: Scaffold(
+  drawer: _buildSidebar(context, fullName, primaryColor),
+  backgroundColor: backgroundColor,
+
+  // ✅ فقط وقتی صفحه OCR هست، AppBar نشون بده
+  appBar: _currentIndex  == 0
+      ? AppBar(
+          automaticallyImplyLeading: true,
+          backgroundColor: primaryColor,
+          title: const Center(
+            child: Text(
+              'پردازش OCR',
+              style: TextStyle(
+                fontFamily: 'Kalameh',
+                color: Colors.black,
+                // fontWeight: FontWeight.bold,
               ),
             ),
-            //هم رنگ appbar
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.history, size: 28,color: Colors.transparent,),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HistoryPage()),
-                ),
-              ),
-            ],
-
-            // actions: [Container()],
           ),
-          body: isLoading
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      LoadingAnimationWidget.staggeredDotsWave(
-                        color: primaryColor,
-                        size: 80,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'در حال پردازش تصویر...',
-                        style: TextStyle(
-                          fontFamily: 'Vazir',
-                          color: primaryColor,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : Column(
-                  children: [
-                    _buildUserInfoCard(mobileNumber, firstName, lastName),
-                    _buildUploadSection(),
-                  ],
-                ),
-        ),
-      ),
-    );
-  }
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.history, size: 28, color: Colors.transparent),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const HistoryPage()),
+              ),
+            ),
+          ],
+        )
+      : null, // ❌ برای صفحات دیگه AppBar نداشته باش
+
+  body: _buildCurrentPage(),
+  bottomNavigationBar: _buildBottomNavigationBar(),
+)
+
+    ),
+  );
+}
+
 }
 
 class ExtractedTextPage extends StatelessWidget {
@@ -703,7 +854,7 @@ class ExtractedTextPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('متن استخراج‌شده', style: TextStyle(fontFamily: 'Vazir')),
+        title: const Text('متن استخراج‌شده', style: TextStyle(fontFamily: 'Kalameh')),
         backgroundColor: Colors.green,
       ),
       body: _ExtractedTextBody(text: text, imagePath: imagePath),
@@ -749,7 +900,7 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
                 child: SelectableText(
                   widget.text,
                   style: TextStyle(
-                    fontFamily: 'Vazir',
+                    fontFamily: 'Kalameh',
                     fontSize: 16,
                     height: 1.8,
                   ),
@@ -797,7 +948,7 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
                     child: const Text(
                       'ویرایش متن',
                       style: TextStyle(
-                        fontFamily: 'Vazir',
+                        fontFamily: 'Kalameh',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -828,7 +979,7 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
                     child: const Text(
                       'ارسال به چت',
                       style: TextStyle(
-                        fontFamily: 'Vazir',
+                        fontFamily: 'Kalameh',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -874,7 +1025,7 @@ class _EditTextPageState extends State<EditTextPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ویرایش متن', style: TextStyle(fontFamily: 'Vazir')),
+        title: const Text('ویرایش متن', style: TextStyle(fontFamily: 'Kalameh')),
         backgroundColor: Colors.orange,
         automaticallyImplyLeading: false,
         shape: const RoundedRectangleBorder(
@@ -914,10 +1065,10 @@ class _EditTextPageState extends State<EditTextPage> {
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(16),
                     hintText: 'متن استخراج شده را در اینجا ویرایش کنید...',
-                    hintStyle: TextStyle(fontFamily: 'Vazir'),
+                    hintStyle: TextStyle(fontFamily: 'Kalameh'),
                   ),
                   style: TextStyle(
-                    fontFamily: 'Vazir',
+                    fontFamily: 'Kalameh',
                     fontSize: 16,
                     height: 1.8,
                   ),
@@ -961,7 +1112,7 @@ class _EditTextPageState extends State<EditTextPage> {
                 child: const Text(
                   'ذخیره و ارسال به چت',
                   style: TextStyle(
-                    fontFamily: 'Vazir',
+                    fontFamily: 'Kalameh',
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -975,3 +1126,73 @@ class _EditTextPageState extends State<EditTextPage> {
     );
   }
 }
+
+
+
+
+class _BottomNavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+  final Color primaryColor;
+
+  const _BottomNavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+    required this.primaryColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isActive ? primaryColor.withOpacity(0.15) : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              isActive ? activeIcon : icon,
+              size: 24,
+              color: isActive ? primaryColor : Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Kalameh',
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              color: isActive ? primaryColor : Colors.grey.shade600,
+            ),
+          ),
+          if (isActive)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              height: 3,
+              width: 20,
+              decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+

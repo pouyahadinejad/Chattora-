@@ -1172,7 +1172,9 @@
 
 
 import 'package:flutter/material.dart';
-
+import 'package:otpuivada/chat_list_page.dart';
+import 'package:otpuivada/ocrpdf.dart';
+// import 'package:otpuivada/bottom_hamburger_menu.dart';
 import 'dart:io';
 // import 'package:flutter/material.dart';
 import 'package:otpuivada/storage_helper.dart';
@@ -1180,6 +1182,7 @@ import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class HistoryPage extends StatefulWidget {
+  
   const HistoryPage({super.key});
 
   @override
@@ -1187,9 +1190,11 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  late BuildContext _context;
   List<HistoryItem> items = [];
   bool isLoading = false;
   bool isDeleting = false;
+  
 
   // رنگ‌های اختصاصی
   final Color primaryColor = const Color(0xFF2E7D32);
@@ -1198,6 +1203,8 @@ class _HistoryPageState extends State<HistoryPage> {
   final Color cardColor = Colors.white;
   final Color textColor = const Color(0xFF263238);
   final Color errorColor = const Color(0xFFE57373);
+  
+
 
   @override
   void initState() {
@@ -1213,25 +1220,31 @@ class _HistoryPageState extends State<HistoryPage> {
       isLoading = false;
     });
   }
+  
+//   TextDirection getTextDirection(String text) {
+//   final isEnglish = RegExp(r'^[\x00-\x7F]+$').hasMatch(text);
+//   return isEnglish ? TextDirection.ltr : TextDirection.rtl;
+// }
+
 
   Future<void> _deleteItem(String imagePath) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('حذف آیتم', style: TextStyle(fontFamily: 'Vazir')),
+        title: const Text('حذف آیتم', style: TextStyle(fontFamily: 'Kalameh')),
         content: const Text('آیا از حذف این مورد اطمینان دارید؟', 
-            style: TextStyle(fontFamily: 'Vazir')),
+            style: TextStyle(fontFamily: 'Kalameh')),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('انصراف', style: TextStyle(fontFamily: 'Vazir')),
+            child: const Text('انصراف', style: TextStyle(fontFamily: 'Kalameh')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('حذف', style: TextStyle(fontFamily: 'Vazir')),
+            child: const Text('حذف', style: TextStyle(fontFamily: 'Kalameh')),
           ),
         ],
       ),
@@ -1248,7 +1261,7 @@ class _HistoryPageState extends State<HistoryPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('آیتم با موفقیت حذف شد', 
-              style: TextStyle(fontFamily: 'Vazir')),
+              style: TextStyle(fontFamily: 'Kalameh')),
           backgroundColor: primaryColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -1263,20 +1276,20 @@ class _HistoryPageState extends State<HistoryPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('حذف همه تاریخچه', style: TextStyle(fontFamily: 'Vazir')),
+        title: const Text('حذف همه تاریخچه', style: TextStyle(fontFamily: 'Kalameh')),
         content: const Text('آیا می‌خواهید تمام تاریخچه را پاک کنید؟', 
-            style: TextStyle(fontFamily: 'Vazir')),
+            style: TextStyle(fontFamily: 'Kalameh')),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('انصراف', style: TextStyle(fontFamily: 'Vazir')),
+            child: const Text('انصراف', style: TextStyle(fontFamily: 'Kalameh')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('حذف همه', style: TextStyle(fontFamily: 'Vazir')),
+            child: const Text('حذف همه', style: TextStyle(fontFamily: 'Kalameh')),
           ),
         ],
       ),
@@ -1293,7 +1306,7 @@ class _HistoryPageState extends State<HistoryPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('تمام تاریخچه حذف شد', 
-              style: TextStyle(fontFamily: 'Vazir')),
+              style: TextStyle(fontFamily: 'Kalameh')),
           backgroundColor: primaryColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -1305,20 +1318,20 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   void _showDetails(HistoryItem item) {
-    final dateFormat = DateFormat('yyyy/MM/dd - HH:mm');
+    // final dateFormat = DateFormat('yyyy/MM/dd - HH:mm');
     
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => Scaffold(
           appBar: AppBar(
-            title: const Text('جزئیات تاریخچه', style: TextStyle(fontFamily: 'Vazir')),
+            title: Center(child: const Text('جزئیات تاریخچه', style: TextStyle(fontFamily: 'Kalameh'))),
             backgroundColor: primaryColor,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(20),
-              ),
-            ),
+            // shape: const RoundedRectangleBorder(
+            //   borderRadius: BorderRadius.vertical(
+            //     bottom: Radius.circular(20),
+            //   ),
+            // ),
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -1367,38 +1380,38 @@ class _HistoryPageState extends State<HistoryPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'تاریخ و زمان:',
-                        style: TextStyle(
-                          fontFamily: 'Vazir',
-                          fontWeight: FontWeight.bold,
-                          color: textColor.withOpacity(0.8),
-                        ),
-                      ),
-                      Text(
-                        '',
-                        // dateFormat.format(DateTime.parse(item.timestamp)),
-                        style: TextStyle(
-                          fontFamily: 'Vazir',
-                          color: textColor.withOpacity(0.6),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'شناسه چت:',
-                        style: TextStyle(
-                          fontFamily: 'Vazir',
-                          fontWeight: FontWeight.bold,
-                          color: textColor.withOpacity(0.8),
-                        ),
-                      ),
-                      Text(
-                        item.chatId,
-                        style: TextStyle(
-                          fontFamily: 'Vazir',
-                          color: textColor.withOpacity(0.6),
-                        ),
-                      ),
+                      // Text(
+                      //   'تاریخ و زمان:',
+                      //   style: TextStyle(
+                      //     fontFamily: 'Vazir',
+                      //     fontWeight: FontWeight.bold,
+                      //     color: textColor.withOpacity(0.8),
+                      //   ),
+                      // ),
+                      // Text(
+                      //   '',
+                      //   // dateFormat.format(DateTime.parse(item.timestamp)),
+                      //   style: TextStyle(
+                      //     fontFamily: 'Vazir',
+                      //     color: textColor.withOpacity(0.6),
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 12),
+                      // Text(
+                      //   'شناسه چت:',
+                      //   style: TextStyle(
+                      //     fontFamily: 'Vazir',
+                      //     fontWeight: FontWeight.bold,
+                      //     color: textColor.withOpacity(0.8),
+                      //   ),
+                      // ),
+                      // Text(
+                      //   item.chatId,
+                      //   style: TextStyle(
+                      //     fontFamily: 'Vazir',
+                      //     color: textColor.withOpacity(0.6),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -1425,7 +1438,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       Text(
                         'سوال شما:',
                         style: TextStyle(
-                          fontFamily: 'Vazir',
+                          fontFamily: 'Kalameh',
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           color: primaryColor,
@@ -1435,7 +1448,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       Text(
                         item.userMessage,
                         style: TextStyle(
-                          fontFamily: 'Vazir',
+                          fontFamily: 'Kalameh',
                           fontSize: 16,
                           height: 1.8,
                         ),
@@ -1466,7 +1479,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       Text(
                         'پاسخ:',
                         style: TextStyle(
-                          fontFamily: 'Vazir',
+                          fontFamily: 'Kalameh',
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           color: primaryColor,
@@ -1476,7 +1489,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       Text(
                         item.chatResponse,
                         style: TextStyle(
-                          fontFamily: 'Vazir',
+                          fontFamily: 'Kalameh',
                           fontSize: 16,
                           height: 1.8,
                         ),
@@ -1495,7 +1508,9 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Widget _buildHistoryItem(HistoryItem item) {
-    final dateFormat = DateFormat('yyyy/MM/dd - HH:mm');
+    //  _context = context;  // ذخیره context
+    //    final hasParentNavigation = context.findAncestorWidgetOfExactType<Scaffold>()?.bottomNavigationBar != null;
+    // // final dateFormat = DateFormat('yyyy/MM/dd - HH:mm');
     
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -1554,7 +1569,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       '',
                       // dateFormat.format(DateTime.parse(item.timestamp)),
                       style: TextStyle(
-                        fontFamily: 'Vazir',
+                        fontFamily: 'Kalameh',
                         fontSize: 12,
                         color: textColor.withOpacity(0.5),
                       ),
@@ -1568,7 +1583,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 Text(
                   'سوال:',
                   style: TextStyle(
-                    fontFamily: 'Vazir',
+                    fontFamily: 'Kalameh',
                     fontWeight: FontWeight.bold,
                     color: primaryColor,
                   ),
@@ -1579,7 +1594,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'Vazir',
+                    fontFamily: 'Kalameh',
                     color: textColor,
                   ),
                 ),
@@ -1590,18 +1605,19 @@ class _HistoryPageState extends State<HistoryPage> {
                 Text(
                   'پاسخ:',
                   style: TextStyle(
-                    fontFamily: 'Vazir',
+                    fontFamily: 'Kalameh',
                     fontWeight: FontWeight.bold,
                     color: primaryColor,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
+                  // textDirection: TextDirection.ltr,
                   item.chatResponse,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'Vazir',
+                    fontFamily: 'Kalameh',
                     color: textColor.withOpacity(0.8),
                   ),
                 ),
@@ -1616,7 +1632,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       onPressed: () => _showDetails(item),
                       child: const Text(
                         'مشاهده جزئیات',
-                        style: TextStyle(fontFamily: 'Vazir'),
+                        style: TextStyle(fontFamily: 'Kalameh'),
                       ),
                     ),
                     IconButton(
@@ -1650,7 +1666,7 @@ class _HistoryPageState extends State<HistoryPage> {
           Text(
             'تاریخچه‌ای یافت نشد',
             style: TextStyle(
-              fontFamily: 'Vazir',
+              fontFamily: 'Kalameh',
               fontSize: 18,
               color: textColor.withOpacity(0.6),
             ),
@@ -1659,7 +1675,7 @@ class _HistoryPageState extends State<HistoryPage> {
           Text(
             'پردازش‌های شما اینجا نمایش داده می‌شود',
             style: TextStyle(
-              fontFamily: 'Vazir',
+              fontFamily: 'Kalameh',
               fontSize: 14,
               color: textColor.withOpacity(0.4),
             ),
@@ -1671,17 +1687,19 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+         _context = context;  // ذخیره context
+       final hasParentNavigation = context.findAncestorWidgetOfExactType<Scaffold>()?.bottomNavigationBar != null;
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text('تاریخچه پردازش‌ها', style: TextStyle(fontFamily: 'Vazir')),
+        title: const Text('تاریخچه پردازش‌ها', style: TextStyle(fontFamily: 'Kalameh')),
         backgroundColor: primaryColor,
         centerTitle: true,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(20),
-          ),
-        ),
+        // shape: const RoundedRectangleBorder(
+        //   borderRadius: BorderRadius.vertical(
+        //     bottom: Radius.circular(20),
+        //   ),
+        // ),
         actions: [
           if (items.isNotEmpty)
             IconButton(
@@ -1706,6 +1724,128 @@ class _HistoryPageState extends State<HistoryPage> {
                     children: items.map(_buildHistoryItem).toList(),
                   ),
                 ),
+                 bottomNavigationBar: hasParentNavigation ? null : _buildBottomNavigationBar(context),
+    );
+  }
+}
+
+Widget _buildBottomNavigationBar(BuildContext context) {
+  return Container(
+    height: 80,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.1),
+          blurRadius: 10,
+          spreadRadius: 2,
+        ),
+      ],
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _BottomNavItem(
+          icon: Icons.home_outlined,
+          activeIcon: Icons.home_rounded,
+          label: 'خانه',
+          isActive: false,
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => OCRPdfApp()),
+            );
+          },
+          primaryColor: Colors.green,
+        ),
+        _BottomNavItem(
+          icon: Icons.history,
+          activeIcon: Icons.history_rounded,
+          label: 'تاریخچه',
+          isActive: true,
+          onTap:null,
+          primaryColor: Colors.green,
+        ),
+        _BottomNavItem(
+          icon: Icons.chat_bubble_outline,
+          activeIcon: Icons.chat_rounded,
+          label: 'چت',
+          isActive: false, 
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => ChatListPage(imagePath: '',)),
+            );
+          },
+          primaryColor: Colors.green,
+        ),
+      ],
+    ),
+  );
+}
+
+class _BottomNavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool isActive;
+  final VoidCallback? onTap;
+  final Color primaryColor;
+
+  const _BottomNavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+    required this.primaryColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isActive ? primaryColor.withOpacity(0.15) : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              isActive ? activeIcon : icon,
+              size: 24,
+              color: isActive ? primaryColor : Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Kalameh',
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              color: isActive ? primaryColor : Colors.grey.shade600,
+            ),
+          ),
+          if (isActive)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              height: 3,
+              width: 20,
+              decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

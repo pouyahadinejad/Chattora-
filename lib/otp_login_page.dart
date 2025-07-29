@@ -128,7 +128,7 @@ class _OtpLoginPageState extends State<OtpLoginPage> with TickerProviderStateMix
         content: Text(
           message,
           style: TextStyle(
-            fontFamily: 'Vazir',
+            fontFamily: 'Kalameh',
             color: Colors.white,
             fontSize: 15,
           ),
@@ -153,7 +153,7 @@ class _OtpLoginPageState extends State<OtpLoginPage> with TickerProviderStateMix
           title: Text(
             "ورود",
             style: TextStyle(
-              fontFamily: 'Vazir',
+              fontFamily: 'Kalameh',
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
@@ -235,7 +235,7 @@ class _OtpLoginPageState extends State<OtpLoginPage> with TickerProviderStateMix
                   'شماره موبایل خود را وارد کنید',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Vazir',
+                    fontFamily: 'Kalameh',
                     color: Colors.black,
                     fontSize: 12
                   ),
@@ -248,14 +248,14 @@ class _OtpLoginPageState extends State<OtpLoginPage> with TickerProviderStateMix
                 keyboardType: TextInputType.phone,
                 style: TextStyle(
                   color: Colors.black,
-                  fontFamily: 'Vazir',
+                  fontFamily: 'Kalameh',
                 ),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.grey.withOpacity(0.3),
                   hintText: 'شماره موبایل',
                   hintStyle: TextStyle(
-                    fontFamily: 'Vazir',
+                    fontFamily: 'Kalameh',
                     color: Colors.white,
                   ),
                   border: OutlineInputBorder(
@@ -303,14 +303,14 @@ class _OtpLoginPageState extends State<OtpLoginPage> with TickerProviderStateMix
                                   'ارسال مجدد تا $timerSeconds',
                                   style: TextStyle(
                                     fontSize: 16,
-                                    fontFamily: 'Vazir',
+                                    fontFamily: 'Kalameh',
                                     color: Colors.white,
                                   ),
                                 )
                               : Text(
                                   'ارسال کد',
                                   style: TextStyle(
-                                    fontFamily: 'Vazir',
+                                    fontFamily: 'Kalameh',
                                     fontSize: 16,
                                     color: Colors.white,
                                   ),

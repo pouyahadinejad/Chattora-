@@ -156,7 +156,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
         content: Text(
           message,
           style: TextStyle(
-            fontFamily: 'Vazir',
+            fontFamily: 'Kalameh',
             color: Colors.white,
             fontSize: 15,
           ),
@@ -295,7 +295,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
       textStyle: TextStyle(
         fontSize: 24,
         color: Colors.green.shade800,
-        fontFamily: 'Vazir',
+        fontFamily: 'Kalameh',
         fontWeight: FontWeight.bold,
       ),
       decoration: BoxDecoration(
@@ -357,7 +357,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
                                 style: theme.textTheme.bodyLarge?.copyWith(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'Vazir',
+                                  fontFamily: 'Kalameh',
                                   fontSize: 13,
                                 ),
                               ),
@@ -381,7 +381,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
                                 Text(
                                   'ارسال مجدد تا $timerSeconds ثانیه دیگر',
                                   style: TextStyle(
-                                    fontFamily: 'Vazir',
+                                    fontFamily: 'Kalameh',
                                     color: Colors.black54,
                                     fontSize: 13,
                                   ),
@@ -392,7 +392,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
                                   child: Text(
                                     'ارسال مجدد کد',
                                     style: TextStyle(
-                                      fontFamily: 'Vazir',
+                                      fontFamily: 'Kalameh',
                                       color: Colors.green,
                                       fontSize: 14,
                                     ),
@@ -436,7 +436,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
                                           style: theme.textTheme.bodyLarge
                                               ?.copyWith(
                                             color: Colors.white,
-                                            fontFamily: 'Vazir',
+                                            fontFamily: 'Kalameh',
                                             fontSize: 15,
                                           ),
                                         ),

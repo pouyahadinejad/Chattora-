@@ -7,6 +7,7 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:otpuivada/auth_service.dart';
+import 'package:otpuivada/history_page.dart';
 import 'package:otpuivada/ocrpdf.dart';
 import 'package:otpuivada/storage_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +28,7 @@ class ChatListPage extends StatefulWidget {
 }
 
 class _ChatListPageState extends State<ChatListPage> {
+  late BuildContext _context;
   late final AutoScrollController _scrollController;
   final TextEditingController messageController = TextEditingController();
   List<types.Message> messages = [];
@@ -60,7 +62,7 @@ void initState() {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    // _scrollController.dispose();///////////////////////////////////////
     messageController.dispose();
     super.dispose();
   }
@@ -74,6 +76,19 @@ void initState() {
       );
     }
   }
+  void setOcrData(String message, String imagePath) {
+  if (!mounted) return;
+  
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (_) => ChatListPage(
+        initialMessage: message,
+        imagePath: imagePath,
+      ),
+    ),
+  );
+}
 
   void _handleScrollPosition() {
     if (_scrollController.hasClients) {
@@ -364,7 +379,7 @@ Start answering now.
           Text(
             'اطلاعات اشتراک',
             style: TextStyle(
-              fontFamily: 'Vazir',
+              fontFamily: 'Kalameh',
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
@@ -386,7 +401,7 @@ Start answering now.
                 : 'پیام‌های رایگان شما تمام شده است.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontFamily: 'Vazir',
+              fontFamily: 'Kalameh',
               fontSize: 16,
               color: Colors.black87,
             ),
@@ -400,7 +415,7 @@ Start answering now.
             child: Text(
               'باشه',
               style: TextStyle(
-                fontFamily: 'Vazir',
+                fontFamily: 'Kalameh',
                 fontWeight: FontWeight.bold,
                 color: Colors.green,
               ),
@@ -415,11 +430,21 @@ Start answering now.
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-         onWillPop: () async => false, // یعنی نذار بک بزنن
+     _context = context;  // ذخیره context
+       final hasParentNavigation = context.findAncestorWidgetOfExactType<Scaffold>()?.bottomNavigationBar != null;
+  return WillPopScope(
+    onWillPop: () async {
+      // وقتی کاربر دکمه بازگشت را میزند، به صفحه اصلی برمی‌گردد
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => OCRPdfApp()),
+      );
+      return false;
+    },
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          
           //   leading: IconButton(
           //   icon: Icon(Icons.arrow_back),
           //   onPressed: () {
@@ -427,9 +452,10 @@ Start answering now.
           //   },
           // ),
           automaticallyImplyLeading: false,
-          title: Text("چت", style: TextStyle(fontFamily: 'Vazir')),
-          backgroundColor: Colors.green,
+          title: Center(child: Text("چت", style: TextStyle(fontFamily: 'Kalameh'))),
+          backgroundColor:Color(0xFF2E7D32),
           actions: [
+            
             // IconButton(
             //   icon: Icon(Icons.logout),
             //   onPressed: () async {
@@ -460,25 +486,26 @@ Start answering now.
                         scrollController: _scrollController,
                         scrollPhysics: const BouncingScrollPhysics(),
                         theme: DefaultChatTheme(
+                          // fontFamily: 'Kalameh',
                           primaryColor: Colors.green,
                           secondaryColor: Colors.green.shade100,
                           inputBackgroundColor: Colors.white,
                           inputTextColor: Colors.black,
                           inputTextDecoration: InputDecoration(
                             hintText: 'پیام خود را بنویسید...',
-                            hintStyle: TextStyle(fontFamily: 'Vazir'),
+                            hintStyle: TextStyle(fontFamily: 'Kalameh'),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.symmetric(horizontal: 16),
                           ),
                           backgroundColor: Colors.white,
                           receivedMessageBodyTextStyle: TextStyle(
                             color: Colors.black,
-                            fontFamily: 'Vazir',
+                            fontFamily: 'Kalameh',
                             fontSize: 16,
                           ),
                           sentMessageBodyTextStyle: TextStyle(
                             color: Colors.white,
-                            fontFamily: 'Vazir',
+                            fontFamily: 'Kalameh',
                             fontSize: 16,
                           ),
                           // receivedMessageBodyColor: Colors.grey.shade200,
@@ -495,7 +522,7 @@ Start answering now.
                                   controller: messageController,
                                   decoration: InputDecoration(
                                     hintText: 'پیام خود را بنویسید...',
-                                    hintStyle: TextStyle(fontFamily: 'Vazir'),
+                                    hintStyle: TextStyle(fontFamily: 'Kalameh'),
                                     filled: true,
                                     fillColor: Colors.grey.shade100,
                                     border: OutlineInputBorder(
@@ -599,13 +626,184 @@ Start answering now.
             ],
           ),
         ),
-      ),
+          // اینجا BottomNavigationBar را اضافه می‌کنیم
+          bottomNavigationBar: hasParentNavigation ? null : _buildBottomNavigationBar(context),
+      ), 
     );
   }
 }
 
 
+// Widget _buildBottomNavigationBar(BuildContext  context) {
+//   return Directionality(
+//     textDirection: TextDirection.rtl,
+//     child: Container(
+//       height: 80,
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.black.withOpacity(0.1),
+//             blurRadius: 10,
+//             spreadRadius: 2,
+//           ),
+//         ],
+//         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+//       ),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceAround,
+//         children: [
+//           IconButton(
+//             icon: Icon(Icons.home, color: Colors.green),
+//             onPressed: () {
+//               Navigator.pushReplacement(
+//                 context,
+//                 MaterialPageRoute(builder: (_) => OCRPdfApp()),
+//               );
+//             },
+//           ),
+//           IconButton(
+//             icon: Icon(Icons.history, color: Colors.grey),
+//             onPressed: () {
+//               Navigator.pushReplacement(
+//                 context,
+//                 MaterialPageRoute(builder: (_) => HistoryPage()),
+//               );
+//             },
+//           ),
+//           IconButton(
+//             icon: Icon(Icons.chat, color: Colors.green),
+//             onPressed: null, // غیرفعال چون در صفحه چت هستیم
+//           ),
+//         ],
+//       ),
+//     ),
+//   );
+// }
 
+Widget _buildBottomNavigationBar(BuildContext context) {
+  return Directionality(
+    textDirection: TextDirection.rtl,
+    child: Container(
+      height: 80,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _BottomNavItem(
+            icon: Icons.home_outlined,
+            activeIcon: Icons.home_rounded,
+            label: 'خانه',
+            isActive: false,
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => OCRPdfApp()),
+              );
+            },
+            primaryColor: Colors.green,
+          ),
+          _BottomNavItem(
+            icon: Icons.history,
+            activeIcon: Icons.history_rounded,
+            label: 'تاریخچه',
+            isActive: false,
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => HistoryPage()),
+              );
+            },
+            primaryColor: Colors.green,
+          ),
+          _BottomNavItem(
+            icon: Icons.chat_bubble_outline,
+            activeIcon: Icons.chat_rounded,
+            label: 'چت',
+            isActive: true, // این صفحه فعلیه
+            onTap: null,
+            primaryColor: Colors.green,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class _BottomNavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool isActive;
+  final VoidCallback? onTap;
+  final Color primaryColor;
+
+  const _BottomNavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+    required this.primaryColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isActive ? primaryColor.withOpacity(0.15) : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              isActive ? activeIcon : icon,
+              size: 24,
+              color: isActive ? primaryColor : Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Kalameh',
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              color: isActive ? primaryColor : Colors.grey.shade600,
+            ),
+          ),
+          if (isActive)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              height: 3,
+              width: 20,
+              decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
 
 
 
