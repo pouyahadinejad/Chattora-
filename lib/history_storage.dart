@@ -1,26 +1,3 @@
-// import 'package:hive/hive.dart';
-
-// class HistoryStorage {
-//   static Future<void> addImage(String imagePath) async {
-//     final box = await Hive.openBox<String>('imageHistory');
-//     await box.add(imagePath);
-//   }
-
-//   static Future<List<String>> getImages() async {
-//     final box = await Hive.openBox<String>('imageHistory');
-//     return box.values.toList();
-//   }
-
-//   static Future<void> clearHistory() async {
-//     final box = await Hive.openBox<String>('imageHistory');
-//     await box.clear();
-//   }
-// }
-
-
-
-
-
 import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -48,6 +25,26 @@ class HistoryStorage {
       await box.add(path);
     }
   }
+  /// حذف کامل همه مسیرها و فایل‌های ذخیره‌شده
+static Future<void> clearAllImages() async {
+  final box = await _openBox();
+
+  // حذف همه فایل‌ها از حافظه
+  for (var path in box.values) {
+    final file = File(path);
+    if (await file.exists()) {
+      try {
+        await file.delete();
+      } catch (e) {
+        print('خطا در حذف فایل: $e');
+      }
+    }
+  }
+
+  // پاک‌سازی کل باکس
+  await box.clear();
+}
+
 
   /// حذف مسیر عکس و همچنین حذف فایل عکس فیزیکی
   static Future<void> removeImage(String path) async {

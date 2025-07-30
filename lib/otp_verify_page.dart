@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:otpuivada/UserInfoPage.dart';
 import 'package:pinput/pinput.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart';
@@ -182,45 +181,6 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
       }
     }
   }
-
-  // Future<void> checkOtp() async {
-  //     final box = Hive.box<String>('auth');
-  //     final firstName = box.get('first_name');
-  //     final lastName = box.get('last_name');
-  //   if (otpController.text.length != 5) {
-  //     showSnack('لطفا کد را کامل وارد کنید');
-  //     return;
-  //   }
-
-  //   setState(() => loading = true);
-
-  //   var url = Uri.parse('https://payment.vada.ir/api/auth/check-otp');
-
-  //   try {
-  //     var response = await http.post(
-  //       url,
-  //       headers: {'Accept': 'application/json'},
-  //       body: {'mobile': widget.mobile, 'token': otpController.text},
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       var token = jsonDecode(response.body)['token'];
-  //       if (token != null) {
-  //         var box = Hive.box<String>('auth');
-  //         await box.put('token', token);
-  //         await box.put('mobile', widget.mobile);
-  //         Navigator.pushReplacementNamed(context, '/home');
-  //       }
-  //     } else {
-  //       var data = jsonDecode(response.body);
-  //       showSnack(data['message'] ?? 'کد نادرست است');
-  //     }
-  //   } catch (e) {
-  //     showSnack('خطا در ارتباط');
-  //   } finally {
-  //     setState(() => loading = false);
-  //   }
-  // }
   Future<void> checkOtp() async {
   if (otpController.text.length != 5) {
     showSnack('لطفا کد را کامل وارد کنید');

@@ -2,7 +2,6 @@ import 'package:otpuivada/auth_service.dart';
 import 'package:otpuivada/chat_list_page.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -144,15 +143,19 @@ Widget _buildCurrentPage() {
 
   switch (_currentIndex) {
     case 0:
-      return Column(
-        children: [
-          _buildUserInfoCard(
-            Hive.box<String>('auth').get('mobile') ?? 'نامشخص',
-            Hive.box<String>('auth').get('first_name') ?? '---',
-            Hive.box<String>('auth').get('last_name') ?? '---',
-          ),
-          _buildUploadSection(),
-        ],
+      return SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildUserInfoCard(
+              Hive.box<String>('auth').get('mobile') ?? 'نامشخص',
+              Hive.box<String>('auth').get('first_name') ?? '---',
+              Hive.box<String>('auth').get('last_name') ?? '---',
+            ),
+            SizedBox(
+               height: MediaQuery.of(context).size.height * 0.5,
+              child: _buildUploadSection()),
+          ],
+        ),
       );
     case 1:
       return const HistoryPage();
@@ -648,7 +651,7 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
               strokeWidth: 2,              
             child: Container(
               width: MediaQuery.of(context).size.width * 0.9,
-              height: MediaQuery.of(context).size.height * 0.4,
+              height: MediaQuery.of(context).size.height * 0.5,
               decoration: BoxDecoration(
                 color: cardColor,
                 borderRadius: BorderRadius.circular(16),
@@ -716,81 +719,6 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
     );
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   final Box<String> authBox = Hive.box<String>('auth');
-  //   final mobileNumber = authBox.get('mobile') ?? 'نامشخص';
-  //   final firstName = authBox.get('first_name') ?? '---';
-  //   final lastName = authBox.get('last_name') ?? '---';
-  //   final fullName = '$firstName $lastName';
-
-  //   return Directionality(
-  //     textDirection: TextDirection.rtl,
-  //     child: WillPopScope(
-  //       onWillPop: () => _showExitDialog(context),
-  //       child: Scaffold(
-  //         drawer: _buildSidebar(context, fullName, primaryColor),
-  //         backgroundColor: backgroundColor,
-  //         appBar: AppBar(
-  //           automaticallyImplyLeading: true,
-  //           backgroundColor: primaryColor,
-  //           title: const Center(
-  //             child: Text(
-  //               'پردازش OCR',
-  //               style: TextStyle(
-  //                 fontFamily: 'Vazir',
-  //                 color: Colors.white,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //           ),
-  //           //هم رنگ appbar
-  //           actions: [
-  //             IconButton(
-  //               icon: const Icon(Icons.history, size: 28,color: Colors.transparent,),
-  //               onPressed: () => Navigator.push(
-  //                 context,
-  //                 MaterialPageRoute(builder: (_) => const HistoryPage()),
-  //               ),
-  //             ),
-  //           ],
-
-  //           // actions: [Container()],
-  //         ),
-  //           body: _buildCurrentPage(),
-  //           bottomNavigationBar: _buildBottomNavigationBar(),
-          
-  //         // body: isLoading
-  //         //     ? Center(
-  //         //         child: Column(
-  //         //           mainAxisAlignment: MainAxisAlignment.center,
-  //         //           children: [
-  //         //             LoadingAnimationWidget.staggeredDotsWave(
-  //         //               color: primaryColor,
-  //         //               size: 80,
-  //         //             ),
-  //         //             const SizedBox(height: 20),
-  //         //             Text(
-  //         //               'در حال پردازش تصویر...',
-  //         //               style: TextStyle(
-  //         //                 fontFamily: 'Vazir',
-  //         //                 color: primaryColor,
-  //         //                 fontSize: 16,
-  //         //               ),
-  //         //             ),
-  //         //           ],
-  //         //         ),
-  //         //       )
-  //         //     : Column(
-  //         //         children: [
-  //         //           _buildUserInfoCard(mobileNumber, firstName, lastName),
-  //         //           _buildUploadSection(),
-  //         //         ],
-  //         //       ),
-  //       ),
-  //     ),
-  //   );
-  // }
   @override
 Widget build(BuildContext context) {
   final Box<String> authBox = Hive.box<String>('auth');

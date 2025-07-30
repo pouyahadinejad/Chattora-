@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class UserInfoPage extends StatefulWidget {
