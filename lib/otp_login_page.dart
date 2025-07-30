@@ -142,44 +142,49 @@ class _OtpLoginPageState extends State<OtpLoginPage> with TickerProviderStateMix
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-
-          title: Text(
-            "ورود",
-            style: TextStyle(
-              fontFamily: 'Kalameh',
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+    return WillPopScope(
+      onWillPop:()async{
+        return false;
+      },
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+      
+            title: Text(
+              "ورود",
+              style: TextStyle(
+                fontFamily: 'Kalameh',
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
+            centerTitle: true,
+            backgroundColor: Colors.green,
+            elevation: 0,
           ),
-          centerTitle: true,
-          backgroundColor: Colors.green,
-          elevation: 0,
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Column(children: [ Image.asset(
-                          'assets/image.png',
-                          width: constraints.maxWidth,
-                          // height: 220,
-                          fit: BoxFit.fitWidth,
-                        ),
-                        SizedBox(height: 30),
-                        _buildGlassContainer(theme)
-                         ],);
-                  }
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Column(children: [ Image.asset(
+                            'assets/image.png',
+                            width: constraints.maxWidth,
+                            // height: 220,
+                            fit: BoxFit.fitWidth,
+                          ),
+                          SizedBox(height: 30),
+                          _buildGlassContainer(theme)
+                           ],);
+                    }
+                  ),
                 ),
               ),
             ),

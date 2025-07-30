@@ -1,3 +1,4 @@
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:otpuivada/auth_service.dart';
 import 'package:otpuivada/chat_list_page.dart';
 import 'dart:io';
@@ -782,7 +783,8 @@ class ExtractedTextPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('متن استخراج‌شده', style: TextStyle(fontFamily: 'Kalameh')),
+        automaticallyImplyLeading :false,
+        title: Center(child: const Text('متن استخراج‌شده', style: TextStyle(fontFamily: 'Kalameh'))),
         backgroundColor: Colors.green,
       ),
       body: _ExtractedTextBody(text: text, imagePath: imagePath),
@@ -825,12 +827,15 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
               ),
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
-                child: SelectableText(
-                  widget.text,
-                  style: TextStyle(
-                    fontFamily: 'Kalameh',
-                    fontSize: 16,
-                    height: 1.8,
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: SelectableText(
+                    widget.text,
+                    style: TextStyle(
+                      fontFamily: 'Kalameh',
+                      fontSize: 16,
+                      height: 1.8,
+                    ),
                   ),
                 ),
               ),
@@ -853,7 +858,8 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                      // backgroundColor: Colors.green.withOpacity(0.6),
+                      backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -877,8 +883,10 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
                       'ویرایش متن',
                       style: TextStyle(
                         fontFamily: 'Kalameh',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.black,
+                        // fontWeight: FontWeight.bold,
+                        
                       ),
                     ),
                   ),
@@ -908,9 +916,9 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
                       'ارسال به چت',
                       style: TextStyle(
                         fontFamily: 'Kalameh',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        fontSize: 14,
+                        // fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -953,14 +961,14 @@ class _EditTextPageState extends State<EditTextPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ویرایش متن', style: TextStyle(fontFamily: 'Kalameh')),
-        backgroundColor: Colors.orange,
+        title: Center(child: const Text('ویرایش متن', style: TextStyle(fontFamily: 'Kalameh'))),
+        backgroundColor: Colors.green,
         automaticallyImplyLeading: false,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(20),
-          ),
-        ),
+        // shape: const RoundedRectangleBorder(
+        //   borderRadius: BorderRadius.vertical(
+        //     bottom: Radius.circular(20),
+        //   ),
+        // ),
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
@@ -985,20 +993,23 @@ class _EditTextPageState extends State<EditTextPage> {
                     ),
                   ],
                 ),
-                child: TextField(
-                  controller: _controller,
-                  maxLines: null,
-                  expands: true,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(16),
-                    hintText: 'متن استخراج شده را در اینجا ویرایش کنید...',
-                    hintStyle: TextStyle(fontFamily: 'Kalameh'),
-                  ),
-                  style: TextStyle(
-                    fontFamily: 'Kalameh',
-                    fontSize: 16,
-                    height: 1.8,
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: TextField(
+                    controller: _controller,
+                    maxLines: null,
+                    expands: true,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.all(16),
+                      hintText: 'متن استخراج شده را در اینجا ویرایش کنید...',
+                      hintStyle: TextStyle(fontFamily: 'Kalameh'),
+                    ),
+                    style: TextStyle(
+                      fontFamily: 'Kalameh',
+                      fontSize: 16,
+                      height: 1.8,
+                    ),
                   ),
                 ),
               ),
@@ -1041,9 +1052,9 @@ class _EditTextPageState extends State<EditTextPage> {
                   'ذخیره و ارسال به چت',
                   style: TextStyle(
                     fontFamily: 'Kalameh',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    fontSize: 14,
+                    // fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
               ),
