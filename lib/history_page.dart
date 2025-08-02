@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:otpuivada/chat_list_page.dart';
 import 'package:otpuivada/ocrpdf.dart';
 import 'dart:io';
@@ -164,223 +165,244 @@ String _twoDigits(int n) => n.toString().padLeft(2, '0');
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(
-            title: Center(child: const Text('جزئیات تاریخچه', style: TextStyle(fontFamily: 'Kalameh'))),
-            backgroundColor: primaryColor,
-            // shape: const RoundedRectangleBorder(
-            //   borderRadius: BorderRadius.vertical(
-            //     bottom: Radius.circular(20),
-            //   ),
-            // ),
-          ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // تصویر
-                if (item.imagePath.isNotEmpty && File(item.imagePath).existsSync())
+        builder: (_) => SafeArea(
+          child: Scaffold(
+            appBar: AppBar(
+  //              systemOverlayStyle: SystemUiOverlayStyle(
+  //   statusBarColor: Colors.green.shade50,
+  //   statusBarIconBrightness: Brightness.dark,
+  // ),
+              title: Center(child: const Text('جزئیات تاریخچه', style: TextStyle(fontFamily: 'Kalameh'))),
+              backgroundColor: primaryColor,
+              // shape: const RoundedRectangleBorder(
+              //   borderRadius: BorderRadius.vertical(
+              //     bottom: Radius.circular(20),
+              //   ),
+              // ),
+            ),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // تصویر
+                  if (item.imagePath.isNotEmpty && File(item.imagePath).existsSync())
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.file(
+                          File(item.imagePath),
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // اطلاعات تاریخچه
                   Container(
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
+                      color: cardColor,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
-                    child: ClipRRect(
+                    // child: Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     // Text(
+                    //     //   'تاریخ و زمان:',
+                    //     //   style: TextStyle(
+                    //     //     fontFamily: 'Vazir',
+                    //     //     fontWeight: FontWeight.bold,
+                    //     //     color: textColor.withOpacity(0.8),
+                    //     //   ), ),
+                    //     //   Text(
+                    //     //       formatDate(item.time), // این خط تاریخ را نمایش می‌دهد
+                    //     //       style: TextStyle(color: Colors.grey, fontSize: 12),
+                    //     //     ),
+          
+                    //           //    Text(
+                    //           //   formatDate(item.time), // نمایش تاریخ و ساعت
+                    //           //   style: TextStyle(color: Colors.grey, fontSize: 12),
+                    //           // ),
+                    //     // ),
+                    //     // Text(
+                    //     //   '',
+                    //     //   dateFormat.format(DateTime.parse(item.timestamp)),
+                    //     //   style: TextStyle(
+                    //     //     fontFamily: 'Vazir',
+                    //     //     color: textColor.withOpacity(0.6),
+                    //     //   ),
+                    //     // ),
+                    //     // const SizedBox(height: 12),
+                    //     // Text(
+                    //     //   'شناسه چت:',
+                    //     //   style: TextStyle(
+                    //     //     fontFamily: 'Vazir',
+                    //     //     fontWeight: FontWeight.bold,
+                    //     //     color: textColor.withOpacity(0.8),
+                    //     //   ),
+                    //     // ),
+                    //     // Text(
+                    //     //   item.chatId,
+                    //     //   style: TextStyle(
+                    //     //     fontFamily: 'Vazir',
+                    //     //     color: textColor.withOpacity(0.6),
+                    //     //   ),
+                    //     // ),
+                    //   ],
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ChatListPage(imagePath: '',)),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                        //  Text(
+                        //   'شناسه چت:',
+                        //   style: TextStyle(
+                        //     fontFamily: 'Vazir',
+                        //     fontWeight: FontWeight.bold,
+                        //     color: textColor.withOpacity(0.8),
+                        //   ),
+                        // ),
+                        // Text(
+                        //   item.chatId,
+                        //   style: TextStyle(
+                        //     fontFamily: 'Vazir',
+                        //     color: textColor.withOpacity(0.6),
+                        //   ),
+                        // ),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            // color: Colors.blue,
+                            child: const Text('برو به صفحه چت', style: TextStyle(fontFamily: 'Kalameh',color: Colors.black,fontSize: 15)),
+                          ),
+                          Icon(CupertinoIcons.chat_bubble_2,color: Colors.green,)
+                        ],
+                      ),
+                    )
+          
+                    ),
+                  // ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // سوال کاربر
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.file(
-                        File(item.imagePath),
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                
-                const SizedBox(height: 24),
-                
-                // اطلاعات تاریخچه
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  // child: Column(
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     // Text(
-                  //     //   'تاریخ و زمان:',
-                  //     //   style: TextStyle(
-                  //     //     fontFamily: 'Vazir',
-                  //     //     fontWeight: FontWeight.bold,
-                  //     //     color: textColor.withOpacity(0.8),
-                  //     //   ), ),
-                  //     //   Text(
-                  //     //       formatDate(item.time), // این خط تاریخ را نمایش می‌دهد
-                  //     //       style: TextStyle(color: Colors.grey, fontSize: 12),
-                  //     //     ),
-
-                  //           //    Text(
-                  //           //   formatDate(item.time), // نمایش تاریخ و ساعت
-                  //           //   style: TextStyle(color: Colors.grey, fontSize: 12),
-                  //           // ),
-                  //     // ),
-                  //     // Text(
-                  //     //   '',
-                  //     //   dateFormat.format(DateTime.parse(item.timestamp)),
-                  //     //   style: TextStyle(
-                  //     //     fontFamily: 'Vazir',
-                  //     //     color: textColor.withOpacity(0.6),
-                  //     //   ),
-                  //     // ),
-                  //     // const SizedBox(height: 12),
-                  //     // Text(
-                  //     //   'شناسه چت:',
-                  //     //   style: TextStyle(
-                  //     //     fontFamily: 'Vazir',
-                  //     //     fontWeight: FontWeight.bold,
-                  //     //     color: textColor.withOpacity(0.8),
-                  //     //   ),
-                  //     // ),
-                  //     // Text(
-                  //     //   item.chatId,
-                  //     //   style: TextStyle(
-                  //     //     fontFamily: 'Vazir',
-                  //     //     color: textColor.withOpacity(0.6),
-                  //     //   ),
-                  //     // ),
-                  //   ],
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ChatListPage(imagePath: '',)),
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          // color: Colors.blue,
-                          child: const Text('برو به صفحه چت', style: TextStyle(fontFamily: 'Kalameh',color: Colors.black,fontSize: 15)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
                         ),
-                        Icon(CupertinoIcons.chat_bubble_2,color: Colors.green,)
                       ],
                     ),
-                  )
-
-                  ),
-                // ),
-                
-                const SizedBox(height: 24),
-                
-                // سوال کاربر
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'سوال شما:',
-                        style: TextStyle(
-                          fontFamily: 'Kalameh',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: primaryColor,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Directionality(
-                        textDirection: isEnglish(item.userMessage) ? TextDirection.ltr : TextDirection.rtl,
-                        child: Text(
-                          item.userMessage,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'سوال شما:',
                           style: TextStyle(
                             fontFamily: 'Kalameh',
-                            fontSize: 16,
-                            height: 1.8,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: primaryColor,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // پاسخ چت
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),  
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'پاسخ:',
-                        style: TextStyle(
-                          fontFamily: 'Kalameh',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: primaryColor,
+                        const SizedBox(height: 8),
+                        Directionality(
+                          textDirection: isEnglish(item.userMessage) ? TextDirection.ltr : TextDirection.rtl,
+                          child: Text(
+                            item.userMessage,
+                            style: TextStyle(
+                              fontFamily: 'Kalameh',
+                              fontSize: 16,
+                              height: 1.8,
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Directionality(
-                        textDirection: isEnglish(item.userMessage) ? TextDirection.ltr : TextDirection.rtl,
-                        child: Text(
-                          item.chatResponse,
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // پاسخ چت
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),  
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'پاسخ:',
                           style: TextStyle(
                             fontFamily: 'Kalameh',
-                            fontSize: 16,
-                            height: 1.8,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: primaryColor,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        Directionality(
+                          textDirection: isEnglish(item.userMessage) ? TextDirection.ltr : TextDirection.rtl,
+                          child: Text(
+                            item.chatResponse,
+                            style: TextStyle(
+                              fontFamily: 'Kalameh',
+                              fontSize: 16,
+                              height: 1.8,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                //  SizedBox(height: 4),
-                //        Text(
-                //               formatDate(item.time), // نمایش تاریخ و ساعت
-                //               style: TextStyle(color: Colors.grey, fontSize: 12),
-                //             ),
-
-                const SizedBox(height: 24),
-              ],
+                  //  SizedBox(height: 4),
+                  //        Text(
+                  //               formatDate(item.time), // نمایش تاریخ و ساعت
+                  //               style: TextStyle(color: Colors.grey, fontSize: 12),
+                  //             ),
+          
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
           ),
         ),
@@ -570,42 +592,48 @@ String _twoDigits(int n) => n.toString().padLeft(2, '0');
   Widget build(BuildContext context) {
          _context = context;  // ذخیره context
        final hasParentNavigation = context.findAncestorWidgetOfExactType<Scaffold>()?.bottomNavigationBar != null;
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        title: const Text('تاریخچه پردازش‌ها', style: TextStyle(fontFamily: 'Kalameh')),
-        backgroundColor: primaryColor,
-        centerTitle: true,
-        // shape: const RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.vertical(
-        //     bottom: Radius.circular(20),
-        //   ),
-        // ),
-        actions: [
-          if (items.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.delete_sweep),
-              onPressed: _deleteAllItems,
-              tooltip: 'حذف همه تاریخچه',
-            ),
-        ],
-      ),
-      body: isLoading
-          ? Center(
-              child: LoadingAnimationWidget.staggeredDotsWave(
-                color: primaryColor,
-                size: 80,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          //  systemOverlayStyle: SystemUiOverlayStyle(
+          //   statusBarColor: Colors.green.shade50,
+          //   statusBarIconBrightness: Brightness.dark,
+          // ),
+          title: const Text('تاریخچه پردازش‌ها', style: TextStyle(fontFamily: 'Kalameh')),
+          backgroundColor: primaryColor,
+          centerTitle: true,
+          // shape: const RoundedRectangleBorder(
+          //   borderRadius: BorderRadius.vertical(
+          //     bottom: Radius.circular(20),
+          //   ),
+          // ),
+          actions: [
+            if (items.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.delete_sweep),
+                onPressed: _deleteAllItems,
+                tooltip: 'حذف همه تاریخچه',
               ),
-            )
-          : items.isEmpty
-              ? _buildEmptyState()
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: items.map(_buildHistoryItem).toList(),
-                  ),
+          ],
+        ),
+        body: isLoading
+            ? Center(
+                child: LoadingAnimationWidget.staggeredDotsWave(
+                  color: primaryColor,
+                  size: 80,
                 ),
-                 bottomNavigationBar: hasParentNavigation ? null : _buildBottomNavigationBar(context),
+              )
+            : items.isEmpty
+                ? _buildEmptyState()
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: items.map(_buildHistoryItem).toList(),
+                    ),
+                  ),
+                   bottomNavigationBar: hasParentNavigation ? null : _buildBottomNavigationBar(context),
+      ),
     );
   }
 }

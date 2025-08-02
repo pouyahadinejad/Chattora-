@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:http/http.dart' as http;
@@ -37,6 +38,9 @@ class _ChatListPageState extends State<ChatListPage> {
   bool _showScrollToBottomButton = false;
   final types.User _user = const types.User(id: 'user');
   final types.User _bot = const types.User(id: 'bot');
+  //////////////////////............................
+  // String? chatId;
+
   ////////////////////////
 @override
 void initState() {
@@ -47,6 +51,7 @@ void initState() {
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     await loadSentMessageCount();
     await loadMessagesFromLocal();
+    // await loadChatId();
     checkLoginAndFetch();
     
     // این بخش را فقط یک بار و با تاخیر اجرا کنید
@@ -105,6 +110,25 @@ void initState() {
     });
   }
 
+//   // برای ذخیره chat_id
+// Future<void> saveChatId(String id) async {
+//   final prefs = await SharedPreferences.getInstance();
+//   await prefs.setString('chat_id', id);
+//   setState(() {
+//     chatId = id;
+//   });
+// }
+
+// // برای خواندن chat_id
+// Future<String?> loadChatId() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   final id = prefs.getString('chat_id');
+//   setState(() {
+//     chatId = id;
+//   });
+//   return id;
+// }
+
   Future<void> incrementSentMessageCount() async {
     final prefs = await SharedPreferences.getInstance();
     sentMessageCount++;
@@ -118,6 +142,7 @@ void initState() {
   }
 
   Future<void> loadMessagesFromLocal() async {
+    
     final prefs = await SharedPreferences.getInstance();
     final jsonList = prefs.getStringList('chatMessages');
     
@@ -237,7 +262,7 @@ Start answering now.
       return;
     }
 
-    var url = Uri.parse('https://chat.vsrv.ir/api/chats?package_name=com.vada.drive');
+    var url = Uri.parse('https://chat.vsrv.ir/api/chats?package_name=com.vada.ielts');
     final cleaned = cleanOcrText(messageText);
     final prompt = buildPrompt(cleaned);
 
@@ -248,7 +273,7 @@ Start answering now.
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
-          'package_name': 'com.vada.drive',
+          'package_name': 'com.vada.ielts',
         },
         body: jsonEncode({
           'body': prompt,
@@ -316,6 +341,122 @@ Start answering now.
       setState(() => loading = false);
     }
   }
+
+
+// Future<void> sendMessage({required String text}) async {
+//   final messageText = text.trim();
+//   if (messageText.isEmpty) return;
+//   if (loading) return;
+//   if (sentMessageCount >= maxFreeMessages) {
+//     showUpgradeDialog();
+//     return;
+//   }
+
+//   setState(() => loading = true);
+
+//   final userMessage = types.TextMessage(
+//     author: _user,
+//     createdAt: DateTime.now().millisecondsSinceEpoch,
+//     id: 'user_${DateTime.now().millisecondsSinceEpoch}',
+//     text: messageText,
+//   );
+
+//   setState(() {
+//     messages = [userMessage, ...messages];
+//   });
+  
+//   _scrollToBottom();
+
+//   final token = AuthService.getToken();
+//   if (token == null || token.isEmpty) {
+//     Navigator.pushReplacementNamed(context, '/login');
+//     return;
+//   }
+
+//   var url = Uri.parse('https://chat.vsrv.ir/api/chats?package_name=com.vada.drive');
+//   final cleaned = cleanOcrText(messageText);
+//   final prompt = buildPrompt(cleaned);
+
+//   try {
+//     var response = await http.post(
+//       url,
+//       headers: {
+//         'Accept': 'application/json',
+//         'Content-Type': 'application/json',
+//         'Authorization': 'Bearer $token',
+//         'package_name': 'com.vada.drive',
+//       },
+//       body: jsonEncode({
+//         'body': prompt,
+//         'title': 'آزمون آیلتس',
+//         'chat_id': chatId, // اضافه کردن chat_id به درخواست
+//       }),
+//     );
+
+//     if (response.statusCode == 200) {
+//       messageController.clear();
+//       var data = jsonDecode(response.body);
+
+//       String? chatResponse;
+//       String? newChatId;
+
+//       if (data is Map && data.containsKey('body')) {
+//         chatResponse = data['body'];
+//         newChatId = data['id']?.toString();
+//       } else if (data is List && data.isNotEmpty) {
+//         final lastItem = data.last;
+//         chatResponse = lastItem['body'];
+//         newChatId = lastItem['id']?.toString();
+//       }
+
+//       if (chatResponse != null) {
+//         final botMessage = types.TextMessage(
+//           author: _bot,
+//           createdAt: DateTime.now().millisecondsSinceEpoch,
+//           id: 'bot_${DateTime.now().millisecondsSinceEpoch}',
+//           text: chatResponse,
+//         );
+
+//         setState(() {
+//           messages = [botMessage, ...messages];
+//         });
+
+//         // اگر chat_id جدید دریافت شد، آن را ذخیره کنید
+//         if (newChatId != null && newChatId != chatId) {
+//           await saveChatId(newChatId);
+//         }
+
+//         await incrementSentMessageCount();
+//         await saveMessagesToLocal();
+
+//         await HistoryStorage.addItem(HistoryItem(
+//           imagePath: widget.imagePath,
+//           userMessage: cleaned.isNotEmpty ? cleaned : 'پیامی وارد نشده',
+//           chatResponse: chatResponse.isNotEmpty ? chatResponse : 'بدون پاسخ',
+//           chatId: newChatId ?? chatId ?? '', 
+//           time: '',
+//         ));
+//       }
+//     } else {
+//       var errorData = jsonDecode(response.body);
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text(errorData['message'] ?? 'ارسال پیام ناموفق بود')),
+//       );
+//     }
+//   } catch (e) {
+//     print('Error sending message: $e');
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('خطا در ارسال پیام')),
+//     );
+//   } finally {
+//     setState(() => loading = false);
+//   }
+// }
+bool isRtlText(String text) {
+  // تشخیص متن فارسی/عربی بر اساس محدوده Unicode
+  final rtlRegex = RegExp(r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]');
+  return rtlRegex.hasMatch(text);
+}
 
   void showUpgradeDialog() {
     showDialog(
@@ -418,178 +559,197 @@ Start answering now.
       );
       return false;
     },
-      child: Scaffold(
-        // drawer: Container(color: Colors.green,),
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          
-          //   leading: IconButton(
-          //   icon: Icon(Icons.arrow_back),
-          //   onPressed: () {
-          //     Navigator.pop(context);
-          //   },
-          // ),
-          automaticallyImplyLeading: false,
-          title: Center(child: Text("چت", style: TextStyle(fontFamily: 'Kalameh'))),
-          backgroundColor:Color(0xFF2E7D32),
-          actions: [
+      child: SafeArea(
+        child: Scaffold(
+          // drawer: Container(color: Colors.green,),
+          // backgroundColor: Colors.green,
+          appBar: AppBar(
+            //  systemOverlayStyle: SystemUiOverlayStyle(
+            //   statusBarColor: Colors.green.shade50,
+            //   statusBarIconBrightness: Brightness.dark,
+            // ),
             
-            // IconButton(
-            //   icon: Icon(Icons.logout),
-            //   onPressed: () async {
-            //     await AuthService.clearToken();
-            //     Navigator.pushReplacementNamed(context, '/login');
+            //   leading: IconButton(
+            //   icon: Icon(Icons.arrow_back),
+            //   onPressed: () {
+            //     Navigator.pop(context);
             //   },
             // ),
-            IconButton(
-              icon: Icon(Icons.workspace_premium),
-              tooltip: 'اطلاعات اشتراک',
-              onPressed: showRemainingMessagesDialog,
-            ),
-          ],
-        ),
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  Expanded(
-                    child: Directionality(
-                      textDirection: TextDirection.ltr,
-                      child: Chat(
-                        messages: messages,
-                           // messages: messages.reversed.toList(),
-                        onSendPressed: _handleSendPressed,
-                        user: _user,
-                        scrollController: _scrollController,
-                        scrollPhysics: const BouncingScrollPhysics(),
-                        theme: DefaultChatTheme(
-                          // fontFamily: 'Kalameh',
-                          primaryColor: Colors.green,
-                          secondaryColor: Colors.grey.withOpacity(0.4),
-                          inputBackgroundColor: Colors.white,
-                          inputTextColor: Colors.black,
-                          inputTextDecoration: InputDecoration(
-                            hintText: 'پیام خود را بنویسید...',
-                            hintStyle: TextStyle(fontFamily: 'Kalameh',fontSize: 14),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                          backgroundColor: Colors.white,
-                          receivedMessageBodyTextStyle: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Kalameh',
-                            fontSize: 14,
-                          ),
-                          sentMessageBodyTextStyle: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Kalameh',
-                            fontSize: 14,
-                          ),
-                          // receivedMessageBodyColor: Colors.grey.shade200,
-                          // sentMessageBodyColor: Colors.green,
-                          // borderRadius: 12,
-                        ),
-                        customBottomWidget: Container(
-                          color: Colors.white,
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: messageController,
-                                  decoration: InputDecoration(
-                                    hintText: 'پیام خود را بنویسید...',
-                                    hintStyle: TextStyle(fontFamily: 'Kalameh',fontSize: 14),
-                                    filled: true,
-                                    fillColor: Colors.grey.shade100,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 14,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              IconButton(
-                                icon: Icon(Icons.document_scanner),
-                                color: Colors.green,
-                                tooltip: 'ارسال متن از عکس یا PDF',
-                                onPressed: () async {
-                                  final extractedText = await Navigator.push<String>(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => OCRPdfApp()),
-                                  );
-                    
-                    
-                                    if (extractedText != null && extractedText.trim().isNotEmpty) {
-                                    // messageController.text = extractedText;
-                                     setState(() {
-                                      messageController.text = extractedText;
-                                       final ocrMessage = types.TextMessage(
-                                        author: _user,
-                                        createdAt: DateTime.now().millisecondsSinceEpoch,
-                                        id: 'ocr_${DateTime.now().millisecondsSinceEpoch}',
-                                        text: extractedText,
-                                      );
-                                      messages = [ocrMessage, ...messages];
-                                    });
-                                  }},),
-                                ElevatedButton(
-                                 onPressed: loading
-                                    ? null
-                                    : () {
-                                        sendMessage(text: messageController.text);
-                                       },
-                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                ),
-                                child: loading
-                                    ? SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : Icon(Icons.send, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                ],
+            automaticallyImplyLeading: false,
+            title: Center(child: Text("چت", style: TextStyle(fontFamily: 'Kalameh',color: Colors.white,fontWeight: FontWeight.w500))),
+            backgroundColor:Color(0xFF2E7D32),
+            actions: [
+              
+              // IconButton(
+              //   icon: Icon(Icons.logout),
+              //   onPressed: () async {
+              //     await AuthService.clearToken();
+              //     Navigator.pushReplacementNamed(context, '/login');
+              //   },
+              // ),
+              IconButton(
+                icon: Icon(Icons.workspace_premium,color: Colors.white,),
+                tooltip: 'اطلاعات اشتراک',
+                onPressed: showRemainingMessagesDialog,
               ),
-                    if (_showScrollToBottomButton)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 90,right: 18),
-                      // padding: EdgeInsets.all(80),
-                      child: Align(
-                        alignment: Alignment.bottomRight
-                        ,
-                        child: FloatingActionButton(
-                          // mini: true,
-                          backgroundColor: Colors.green,
-                          child: Icon(Icons.arrow_downward, color: Colors.white),
-                          onPressed: _scrollToBottom,
-                        ),
-                      ),
-                    ),
             ],
           ),
+          body: SafeArea(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    Expanded(
+                      child: Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Chat(
+                          
+                          messages: messages,
+                             // messages: messages.reversed.toList(),
+                          onSendPressed: _handleSendPressed,
+                          user: _user,
+                          scrollController: _scrollController,
+                          scrollPhysics: const BouncingScrollPhysics(),
+                          theme: DefaultChatTheme(
+                            
+                            // fontFamily: 'Kalameh',
+                            primaryColor: Colors.green.withOpacity(0.2),
+                            secondaryColor: Colors.grey.withOpacity(0.2),
+                            inputBackgroundColor: Colors.white,
+                            inputTextColor: Colors.black,
+                            inputTextDecoration: InputDecoration(
+                              hintText: 'پیام خود را بنویسید...',
+                              hintStyle: TextStyle(fontFamily: 'Kalameh',fontSize: 14),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                            ),
+                            backgroundColor: Color(0xFFF1F8E9),
+                            receivedMessageBodyTextStyle: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Kalameh',
+                              fontSize: 14,
+                            ),
+                            sentMessageBodyTextStyle: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Kalameh',
+                              fontSize: 14,
+                            ),
+                            // receivedMessageBodyColor: Colors.grey.shade200,
+                            // sentMessageBodyColor: Colors.green,
+                            // borderRadius: 12,
+                          ),
+                          customBottomWidget: Container(
+                            color: Colors.white,
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Directionality(
+                                    textDirection: TextDirection.rtl,
+                                    child: TextField(
+                                    controller: messageController,
+                                    textDirection: messageController.text.isNotEmpty 
+                                        ? isRtlText(messageController.text) 
+                                          ? TextDirection.rtl 
+                                          : TextDirection.ltr
+                                        : null,
+                                    decoration: InputDecoration(
+                                      hintText: 'پیام خود را بنویسید...',
+                                      hintStyle: TextStyle(fontFamily: 'Kalameh', fontSize: 14),
+                                      filled: true,
+                                      fillColor: Colors.grey.shade100,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
+                                    ),
+                                    onChanged: (text) {
+                                      setState(() {}); // برای به روزرسانی جهت متن
+                                    },
+                                                                  ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                IconButton(
+                                  icon: Icon(Icons.document_scanner),
+                                  color: Colors.green,
+                                  tooltip: 'ارسال متن از عکس یا PDF',
+                                  onPressed: () async {
+                                    final extractedText = await Navigator.push<String>(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => OCRPdfApp()),
+                                    );
+                      
+                      
+                                      if (extractedText != null && extractedText.trim().isNotEmpty) {
+                                      // messageController.text = extractedText;
+                                       setState(() {
+                                        messageController.text = extractedText;
+                                         final ocrMessage = types.TextMessage(
+                                          author: _user,
+                                          createdAt: DateTime.now().millisecondsSinceEpoch,
+                                          id: 'ocr_${DateTime.now().millisecondsSinceEpoch}',
+                                          text: extractedText,
+                                        );
+                                        messages = [ocrMessage, ...messages];
+                                      });
+                                    }},),
+                                  ElevatedButton(
+                                   onPressed: loading
+                                      ? null
+                                      : () {
+                                          sendMessage(text: messageController.text);
+                                         },
+                                   style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  child: loading
+                                      ? SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Icon(Icons.send, color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+        
+                  ],
+                ),
+                      if (_showScrollToBottomButton)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 90,right: 18),
+                        // padding: EdgeInsets.all(80),
+                        child: Align(
+                          alignment: Alignment.bottomRight
+                          ,
+                          child: FloatingActionButton(
+                            // mini: true,
+                            backgroundColor: Colors.green,
+                            child: Icon(Icons.arrow_downward, color: Colors.white),
+                            onPressed: _scrollToBottom,
+                          ),
+                        ),
+                      ),
+              ],
+            ),
+          ),
+            // اینجا BottomNavigationBar را اضافه می‌کنیم
+            bottomNavigationBar: hasParentNavigation ? null : _buildBottomNavigationBar(context),
         ),
-          // اینجا BottomNavigationBar را اضافه می‌کنیم
-          bottomNavigationBar: hasParentNavigation ? null : _buildBottomNavigationBar(context),
       ), 
     );
   }

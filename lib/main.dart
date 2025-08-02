@@ -15,22 +15,66 @@ const Color lowPriority = Color(0xff3BE1F1);
 const Color highPriority = primaryColor;
 
 const taskBoxName = 'tasks';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Hive.initFlutter();
   await Hive.openBox<String>('auth');
   await Hive.openBox<String>('imageHistory');
 
+  // حذف این بخش یا تنظیم مشابه AppBarTheme
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      statusBarColor: Colors.green.shade50, // اینجا رنگ Status Bar
-      statusBarIconBrightness: Brightness.light, // آیکن‌های سفید
+      statusBarColor: Color(0xFF2E7D32),
+      statusBarIconBrightness: Brightness.dark,
     ),
   );
 
   runApp(const MyApp());
 }
+
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized(); 
+//   // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+//   // SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+
+//   await Hive.initFlutter();
+//   await Hive.openBox<String>('auth');
+//   await Hive.openBox<String>('imageHistory');
+//   //  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+//   SystemChrome.setSystemUIOverlayStyle(
+//     SystemUiOverlayStyle(
+//       statusBarColor: Colors.green.shade50, // اینجا رنگ Status Bar
+//       statusBarIconBrightness: Brightness.light, // آیکن‌های سفید
+//     ),
+//   );
+
+//   runApp(const MyApp());
+// }
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+
+//   // فقط status bar بالا رو نگه می‌داریم، نوار پایین حذف می‌شه
+//   SystemChrome.setEnabledSystemUIMode(
+//     SystemUiMode.manual,
+//     overlays: [SystemUiOverlay.top],
+//   );
+
+//   await Hive.initFlutter();
+//   await Hive.openBox<String>('auth');
+//   await Hive.openBox<String>('imageHistory');
+
+//   SystemChrome.setSystemUIOverlayStyle(
+//     SystemUiOverlayStyle(
+//       statusBarColor: Colors.green.shade50, // رنگ Status Bar بالا
+//       statusBarIconBrightness: Brightness.dark, // آیکن‌ها تیره (برای پس‌زمینه روشن)
+//     ),
+//   );
+
+//   runApp(const MyApp());
+// }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -47,6 +91,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
+        appBarTheme: AppBarTheme(
+  backgroundColor: Colors.green.shade50,
+  systemOverlayStyle: SystemUiOverlayStyle(
+    statusBarColor: Colors.green.shade50,
+    statusBarIconBrightness: Brightness.dark,
+  ),
+),
+
           fontFamily: 'Kalameh',
           //  bodyMedium: TextStyle(fontSize: 14),
       // headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -88,7 +140,7 @@ class MyApp extends StatelessWidget {
         future: checkToken(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+            return SafeArea(child: const Scaffold(body: Center(child: CircularProgressIndicator())));
           } else if (snapshot.hasData && snapshot.data == true) {
             return OCRPdfApp();
             // bottomNavigationBar: _buildBottomNavigationBar()

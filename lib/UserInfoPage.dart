@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class UserInfoPage extends StatefulWidget {
@@ -38,70 +39,76 @@ class _UserInfoPageState extends State<UserInfoPage> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text('اطلاعات کاربر', style: TextStyle(fontFamily: 'Kalameh')),
-          centerTitle: true,
-          backgroundColor: Colors.green,
-        ),
-        body: Center(
-          child: SingleChildScrollView(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24),
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.4),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  )
-                ],
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      const Text(
-                        'لطفاً نام و نام خانوادگی خود را وارد کنید',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'Kalameh',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        controller: _firstNameController,
-                        decoration: _inputDecoration('نام'),
-                        validator: (value) => (value == null || value.trim().isEmpty) ? 'نام الزامی است' : null,
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _lastNameController,
-                        decoration: _inputDecoration('نام خانوادگی'),
-                        validator: (value) => (value == null || value.trim().isEmpty) ? 'نام خانوادگی الزامی است' : null,
-                      ),
-                      const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _saveInfo,
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            backgroundColor: primaryGreen,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+  //            systemOverlayStyle: SystemUiOverlayStyle(
+  //   statusBarColor: Colors.green.shade50,
+  //   statusBarIconBrightness: Brightness.dark,
+  // ),
+            title: const Text('اطلاعات کاربر', style: TextStyle(fontFamily: 'Kalameh')),
+            centerTitle: true,
+            backgroundColor: Colors.green,
+          ),
+          body: Center(
+            child: SingleChildScrollView(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    )
+                  ],
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        const Text(
+                          'لطفاً نام و نام خانوادگی خود را وارد کنید',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Kalameh',
+                            fontWeight: FontWeight.bold,
                           ),
-                          child: const Text('ثبت و ادامه', style: TextStyle(fontFamily: 'Kalameh', fontSize: 16,color: Colors.black)),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 24),
+                        TextFormField(
+                          controller: _firstNameController,
+                          decoration: _inputDecoration('نام'),
+                          validator: (value) => (value == null || value.trim().isEmpty) ? 'نام الزامی است' : null,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _lastNameController,
+                          decoration: _inputDecoration('نام خانوادگی'),
+                          validator: (value) => (value == null || value.trim().isEmpty) ? 'نام خانوادگی الزامی است' : null,
+                        ),
+                        const SizedBox(height: 32),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: _saveInfo,
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              backgroundColor: primaryGreen,
+                            ),
+                            child: const Text('ثبت و ادامه', style: TextStyle(fontFamily: 'Kalameh', fontSize: 16,color: Colors.black)),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -1,4 +1,5 @@
-import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+// import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:otpuivada/auth_service.dart';
 import 'package:otpuivada/chat_list_page.dart';
 import 'dart:io';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'OCR پردازشگر',
       theme: ThemeData(
+        
         primarySwatch: Colors.green,
         fontFamily: 'Kalameh',
         scaffoldBackgroundColor: const Color(0xFFF1F8E9),
@@ -732,40 +734,46 @@ Widget build(BuildContext context) {
     textDirection: TextDirection.rtl,
     child: WillPopScope(
       onWillPop: () => _showExitDialog(context),
-      child: Scaffold(
-  drawer: _buildSidebar(context, fullName, primaryColor),
-  backgroundColor: backgroundColor,
-
-  // ✅ فقط وقتی صفحه OCR هست، AppBar نشون بده
-  appBar: _currentIndex  == 0
-      ? AppBar(
-          automaticallyImplyLeading: true,
-          backgroundColor: primaryColor,
-          title: const Center(
-            child: Text(
-              'پردازش OCR',
-              style: TextStyle(
-                fontFamily: 'Kalameh',
-                color: Colors.black,
-                // fontWeight: FontWeight.bold,
+      child: SafeArea(
+        child: Scaffold(
+          drawer: _buildSidebar(context, fullName, primaryColor),
+          backgroundColor: backgroundColor,
+        
+          // ✅ فقط وقتی صفحه OCR هست، AppBar نشون بده
+          appBar: _currentIndex  == 0
+        ? AppBar(
+  //          systemOverlayStyle: SystemUiOverlayStyle(
+  //   statusBarColor: Colors.green.shade50,
+  //   statusBarIconBrightness: Brightness.dark,
+  // ),
+            automaticallyImplyLeading: true,
+            backgroundColor: primaryColor,
+            title: const Center(
+              child: Text(
+                'پردازش OCR',
+                style: TextStyle(
+                  fontFamily: 'Kalameh',
+                  color: Colors.black,
+                  // fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.history, size: 28, color: Colors.transparent),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const HistoryPage()),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.history, size: 28, color: Colors.transparent),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HistoryPage()),
+                ),
               ),
-            ),
-          ],
-        )
-      : null, // ❌ برای صفحات دیگه AppBar نداشته باش
-
-  body: _buildCurrentPage(),
-  bottomNavigationBar: _buildBottomNavigationBar(),
-)
+            ],
+          )
+        : null, // ❌ برای صفحات دیگه AppBar نداشته باش
+        
+          body: _buildCurrentPage(),
+          bottomNavigationBar: _buildBottomNavigationBar(),
+        ),
+      )
 
     ),
   );
@@ -781,13 +789,20 @@ class ExtractedTextPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading :false,
-        title: Center(child: const Text('متن استخراج‌شده', style: TextStyle(fontFamily: 'Kalameh'))),
-        backgroundColor: Colors.green,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          
+  //          systemOverlayStyle: SystemUiOverlayStyle(
+  //   statusBarColor: Colors.green.shade50,
+  //   statusBarIconBrightness: Brightness.dark,
+  // ),
+          automaticallyImplyLeading :false,
+          title: Center(child: const Text('متن استخراج‌شده', style: TextStyle(fontFamily: 'Kalameh'))),
+          backgroundColor: Colors.green,
+        ),
+        body: _ExtractedTextBody(text: text, imagePath: imagePath),
       ),
-      body: _ExtractedTextBody(text: text, imagePath: imagePath),
     );
   }
 }
@@ -807,126 +822,128 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(16),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade50,
+        body: Column(
+          children: [
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: SelectableText(
+                      widget.text,
+                      style: TextStyle(
+                        fontFamily: 'Kalameh',
+                        fontSize: 16,
+                        height: 1.8,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
                     blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    offset: const Offset(0, -5),
                   ),
                 ],
               ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Directionality(
-                  textDirection: TextDirection.ltr,
-                  child: SelectableText(
-                    widget.text,
-                    style: TextStyle(
-                      fontFamily: 'Kalameh',
-                      fontSize: 16,
-                      height: 1.8,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        // backgroundColor: Colors.green.withOpacity(0.6),
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                        final editedText = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => EditTextPage(
+                              initialText: widget.text,
+                              imagePath: widget.imagePath,
+                            ),
+                          ),
+                        );
+                        if (editedText != null) {
+                          Navigator.pop(context, editedText);
+                        }
+                      },
+                      child: const Text(
+                        'ویرایش متن',
+                        style: TextStyle(
+                          fontFamily: 'Kalameh',
+                          fontSize: 14,
+                          color: Colors.black,
+                          // fontWeight: FontWeight.bold,
+                          
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ChatListPage(
+                              initialMessage: widget.text,
+                              imagePath: widget.imagePath,
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'ارسال به چت',
+                        style: TextStyle(
+                          fontFamily: 'Kalameh',
+                          fontSize: 14,
+                          // fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      // backgroundColor: Colors.green.withOpacity(0.6),
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () async {
-                      final editedText = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => EditTextPage(
-                            initialText: widget.text,
-                            imagePath: widget.imagePath,
-                          ),
-                        ),
-                      );
-                      if (editedText != null) {
-                        Navigator.pop(context, editedText);
-                      }
-                    },
-                    child: const Text(
-                      'ویرایش متن',
-                      style: TextStyle(
-                        fontFamily: 'Kalameh',
-                        fontSize: 14,
-                        color: Colors.black,
-                        // fontWeight: FontWeight.bold,
-                        
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ChatListPage(
-                            initialMessage: widget.text,
-                            imagePath: widget.imagePath,
-                          ),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'ارسال به چت',
-                      style: TextStyle(
-                        fontFamily: 'Kalameh',
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -959,108 +976,114 @@ class _EditTextPageState extends State<EditTextPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(child: const Text('ویرایش متن', style: TextStyle(fontFamily: 'Kalameh'))),
-        backgroundColor: Colors.green,
-        automaticallyImplyLeading: false,
-        // shape: const RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.vertical(
-        //     bottom: Radius.circular(20),
-        //   ),
-        // ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Directionality(
-                  textDirection: TextDirection.ltr,
-                  child: TextField(
-                    controller: _controller,
-                    maxLines: null,
-                    expands: true,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(16),
-                      hintText: 'متن استخراج شده را در اینجا ویرایش کنید...',
-                      hintStyle: TextStyle(fontFamily: 'Kalameh'),
-                    ),
-                    style: TextStyle(
-                      fontFamily: 'Kalameh',
-                      fontSize: 16,
-                      height: 1.8,
-                    ),
-                  ),
-                ),
-              ),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+  //          systemOverlayStyle: SystemUiOverlayStyle(
+  //   statusBarColor: Colors.green.shade50,
+  //   statusBarIconBrightness: Brightness.dark,
+  // ),
+          title: Center(child: const Text('ویرایش متن', style: TextStyle(fontFamily: 'Kalameh'))),
+          backgroundColor: Colors.green,
+          automaticallyImplyLeading: false,
+          // shape: const RoundedRectangleBorder(
+          //   borderRadius: BorderRadius.vertical(
+          //     bottom: Radius.circular(20),
+          //   ),
+          // ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => Navigator.pop(context),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
+          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ChatListPage(
-                        initialMessage: _controller.text,
-                        imagePath: widget.imagePath,
+                  child: Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: TextField(
+                      controller: _controller,
+                      maxLines: null,
+                      expands: true,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(16),
+                        hintText: 'متن استخراج شده را در اینجا ویرایش کنید...',
+                        hintStyle: TextStyle(fontFamily: 'Kalameh'),
+                      ),
+                      style: TextStyle(
+                        fontFamily: 'Kalameh',
+                        fontSize: 16,
+                        height: 1.8,
                       ),
                     ),
-                  );
-                },
-                child: const Text(
-                  'ذخیره و ارسال به چت',
-                  style: TextStyle(
-                    fontFamily: 'Kalameh',
-                    fontSize: 14,
-                    // fontWeight: FontWeight.bold,
-                    color: Colors.black,
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatListPage(
+                          initialMessage: _controller.text,
+                          imagePath: widget.imagePath,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'ذخیره و ارسال به چت',
+                    style: TextStyle(
+                      fontFamily: 'Kalameh',
+                      fontSize: 14,
+                      // fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
