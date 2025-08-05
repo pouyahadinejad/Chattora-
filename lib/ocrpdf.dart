@@ -1,4 +1,3 @@
-// import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:otpuivada/auth_service.dart';
 import 'package:otpuivada/chat_list_page.dart';

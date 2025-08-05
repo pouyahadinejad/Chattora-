@@ -1,18 +1,138 @@
-// // nice
-
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:otpuivada/PaymentWebView%20.dart';
 import 'package:otpuivada/auth_service.dart';
 import 'package:otpuivada/history_page.dart';
 import 'package:otpuivada/ocrpdf.dart';
 import 'package:otpuivada/storage_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+//  ویجت کارت اشتراک با انیمیشن
 
+
+class AnimatedPlanCard extends StatefulWidget {
+  final Map<String, dynamic> plan;
+  final VoidCallback onTap;
+
+  const AnimatedPlanCard({required this.plan, required this.onTap});
+
+  @override
+  _AnimatedPlanCardState createState() => _AnimatedPlanCardState();
+}
+
+class _AnimatedPlanCardState extends State<AnimatedPlanCard> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: (_) => setState(() => _isPressed = true),
+      onPointerUp: (_) => setState(() => _isPressed = false),
+      child: Transform.scale(
+        scale: _isPressed ? 0.98 : 1.0,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: Colors.green.shade100,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!, width: 1),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: widget.onTap,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    // آیکون ساده
+                    Icon(Icons.workspace_premium, 
+                        color: const Color(0xFF2E7D32), size: 20),
+                    const SizedBox(width: 12),
+                    
+                    // اطلاعات اصلی
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.plan['title'] ?? 'پلن پیشفرض',
+                            style: const TextStyle(
+                              fontFamily: 'Kalameh',
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          //  Text(
+                          //   '۱۵۰,۰۰۰ تومان',
+                          //   style: TextStyle(
+                          //     fontFamily: 'Kalameh',
+                          //     fontSize: 10,
+                          //     color: Colors.red[800],
+                          //     decoration: TextDecoration.lineThrough,
+                          //     decorationColor: Colors.red,
+                          //     decorationThickness: 2,
+                          //   ),
+                          // ),
+                          Text(
+                          '${widget.plan['price'] ?? '0'} تومان',
+                           style: const TextStyle(
+                            fontFamily: 'Kalameh',
+                            color: Colors.black
+                            // fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ],
+                      ),
+                    ),
+                    
+                    // قیمت و دکمه
+                    Row(
+                      // crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                         Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2E7D32),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 4),
+                          child:  Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'خرید اشتراک',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Icon(Icons.keyboard_arrow_left_rounded,color: Colors.white,)
+                            ],
+                          ),
+                          
+                         ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 class ChatListPage extends StatefulWidget {
   final String? initialMessage;
   final String imagePath;
@@ -28,22 +148,24 @@ class ChatListPage extends StatefulWidget {
 }
 
 class _ChatListPageState extends State<ChatListPage> {
+  bool _hasActiveSubscription = false;
+  String  _subscriptionStatus = 'عدم اشتراک';
   late BuildContext _context;
   late final AutoScrollController _scrollController;
   final TextEditingController messageController = TextEditingController();
   List<types.Message> messages = [];
   bool loading = false;
   int sentMessageCount = 0;
-  final int maxFreeMessages = 145;
+  final int maxFreeMessages = 1;
   bool _showScrollToBottomButton = false;
   final types.User _user = const types.User(id: 'user');
   final types.User _bot = const types.User(id: 'bot');
-  //////////////////////............................
-  // String? chatId;
 
-  ////////////////////////
 @override
 void initState() {
+    checkSubscriptionStatus();
+  // هر 5 دقیقه وضعیت اشتراک را چک کنید
+  Timer.periodic(Duration(minutes: 5), (_) => checkSubscriptionStatus());
   _scrollController = AutoScrollController();
   super.initState();
   _scrollController.addListener(_handleScrollPosition);
@@ -109,7 +231,276 @@ void initState() {
       sentMessageCount = prefs.getInt('sentMessageCount') ?? 0;
     });
   }
+//////////////////////////////
+Future<bool> checkUserHasSubscription() async {
+  final token = AuthService.getToken();
+  if (token == null) return false;
 
+  try {
+    final response = await http.get(
+      Uri.parse('https://payment.vada.ir/api/status?package_name=com.vada.ielts'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['status'] == true;
+    }
+    return false;
+  } catch (e) {
+    print('Error checking subscription: $e');
+    return false;
+  }
+}
+///////////////////////////////////
+Future<void> purchaseSubscription(int productId) async {
+  final token = AuthService.getToken();
+  if (token == null) {
+    Navigator.pushReplacementNamed(context, '/login');
+    return;
+  }
+
+  try {
+    // 1. دریافت لینک درگاه پرداخت
+    final paymentUrl = await _getPaymentUrl(token, productId);
+    if (paymentUrl == null) throw 'خطا در دریافت درگاه پرداخت';
+
+    // 2. باز کردن صفحه پرداخت
+    final paymentSuccess = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PaymentWebView(
+          paymentUrl: paymentUrl,
+          callbackUrlScheme: 'ielts', // باید با scheme تعریف شده در native مطابقت داشته باشد
+        ),
+      ),
+    );
+
+    // 3. بررسی نتیجه پرداخت
+    if (paymentSuccess == true) {
+      // 4. تاخیر برای اطمینان از ثبت پرداخت در سرور
+      await Future.delayed(Duration(seconds: 2));
+      
+      // 5. بروزرسانی وضعیت اشتراک
+      final hasSubscription = await checkSubscriptionStatus();
+      
+      if (hasSubscription) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('اشتراک با موفقیت فعال شد')),
+        );
+      } else {
+        throw 'اشتراک فعال نشد. لطفاً چند دقیقه دیگر بررسی کنید';
+      }
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.toString())),
+    );
+  }
+}
+
+Future<String?> _getPaymentUrl(String token, int productId) async {
+  final request = http.MultipartRequest(
+    'POST',
+    Uri.parse('https://payment.vada.ir/api/zarinpal/gateway'),
+  );
+  request.headers.addAll({'Authorization': 'Bearer $token'});
+  request.fields.addAll({
+    'description': 'خرید اشتراک اپلیکیشن آیلتس',
+    'product_id': productId.toString(),
+  });
+
+  final response = await request.send();
+  final responseData = await response.stream.bytesToString();
+  final jsonResponse = jsonDecode(responseData);
+
+  if (response.statusCode == 200) {
+    return jsonResponse['url'];
+  }
+  return null;
+}
+Future<List<Map<String, dynamic>>> fetchSubscriptionPlans() async {
+  final token = AuthService.getToken();
+  if (token == null) return [];
+
+  final url = Uri.parse('https://payment.vada.ir/api/package-names/com.vada.ielts/products');
+  final response = await http.get(
+    url,
+    headers: {'Authorization': 'Bearer $token'},
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.cast<Map<String, dynamic>>();
+  } else {
+    return [];
+  }
+}
+Future<String?> initiatePurchase({required int productId}) async {
+  final token = AuthService.getToken();
+  if (token == null) return null;
+
+  final uri = Uri.parse('https://payment.vada.ir/api/zarinpal/gateway');
+  final request = http.MultipartRequest('POST', uri)
+    ..fields['description'] = 'خرید اشتراک از اپ'
+    ..fields['product_id'] = productId.toString()
+    ..headers['Authorization'] = 'Bearer $token';
+
+  final response = await request.send();
+
+  if (response.statusCode == 200) {
+    final body = await response.stream.bytesToString();
+    final data = jsonDecode(body);
+    return data['url']; // لینک درگاه پرداخت
+  } else {
+    return null;
+  }
+}
+// @override
+// void dispose() {
+//   // لغو درخواست در حال انجام هنگام از بین رفتن ویجت
+//   _subscriptionRequest?.abort();
+//   super.dispose();
+// }
+// متغیر برای مدیریت درخواست
+http.Request? _subscriptionRequest;
+
+Future<bool> checkSubscriptionStatus() async {
+  if (!mounted) return false; // بررسی اولیه قبل از شروع عملیات
+
+  final token = AuthService.getToken();
+  if (token == null) {
+    if (mounted) {
+      setState(() {
+        _hasActiveSubscription = false;
+        _subscriptionStatus = 'ورود نکرده‌اید';
+      });
+    }
+    return false;
+  }
+
+  try {
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+    };
+    
+    _subscriptionRequest = http.Request(
+      'GET', 
+      Uri.parse('https://payment.vada.ir/api/status?package_name=com.vada.ielts')
+    );
+    _subscriptionRequest!.headers.addAll(headers);
+
+    final response = await _subscriptionRequest!.send();
+    final responseBody = await response.stream.bytesToString();
+
+    if (!mounted) return false; // بررسی مجدد قبل از به‌روزرسانی وضعیت
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(responseBody);
+      final hasSubscription = data['products'] != null && 
+        (data['products'] as List).isNotEmpty;
+
+      if (mounted) {
+        setState(() {
+          _hasActiveSubscription = hasSubscription;
+          _subscriptionStatus = hasSubscription ? 'اشتراک فعال' : 'بدون اشتراک';
+        });
+      }
+
+      if (hasSubscription && mounted) {
+        await resetSentMessageCount();
+      }
+
+      return hasSubscription;
+    } else {
+      print('API Error: ${response.statusCode} - ${response.reasonPhrase}');
+      if (mounted) {
+        setState(() {
+          _hasActiveSubscription = false;
+          _subscriptionStatus = 'خطا در بررسی وضعیت';
+        });
+      }
+      return false;
+    }
+  } catch (e) {
+    print('Subscription check error: $e');
+    if (mounted) {
+      setState(() {
+        _hasActiveSubscription = false;
+        _subscriptionStatus = 'خطا در اتصال';
+      });
+    }
+    return false;
+  }
+}
+
+// @override
+// void dispose() {
+//   // لغو درخواست در حال انجام هنگام از بین رفتن ویجت
+//   _subscriptionRequest?.abort();
+//   super.dispose();
+// }
+// Future<bool> checkSubscriptionStatus() async {
+//   final token = AuthService.getToken();
+//   if (token == null) {
+//     setState(() {
+//       _hasActiveSubscription = false;
+//       _subscriptionStatus = 'ورود نکرده‌اید';
+//     });
+//     return false;
+//   }
+
+//   try {
+//     final headers = {
+//       'Authorization': 'Bearer $token',
+//       'Accept': 'application/json',
+//     };
+    
+//     final request = http.Request(
+//       'GET', 
+//       Uri.parse('https://payment.vada.ir/api/status?package_name=com.vada.ielts')
+//     );
+//     request.headers.addAll(headers);
+
+//     final response = await request.send();
+//     final responseBody = await response.stream.bytesToString();
+
+//     if (response.statusCode == 200) {
+//       final data = jsonDecode(responseBody);
+//       final hasSubscription = data['products'] != null && 
+//         (data['products'] as List).isNotEmpty;
+
+//       setState(() {
+//         _hasActiveSubscription = hasSubscription;
+//         _subscriptionStatus = hasSubscription ? 'اشتراک فعال' : 'بدون اشتراک';
+//       });
+
+//       // اگر اشتراک فعال است، تعداد پیام‌ها را ریست کنید
+//       if (hasSubscription) {
+//         await resetSentMessageCount();
+//       }
+
+//       return hasSubscription;
+//     } else {
+//       print('API Error: ${response.statusCode} - ${response.reasonPhrase}');
+//       setState(() {
+//         _hasActiveSubscription = false;
+//         _subscriptionStatus = 'خطا در بررسی وضعیت';
+//       });
+//       return false;
+//     }
+//   } catch (e) {
+//     print('Subscription check error: $e');
+//     setState(() {
+//       _hasActiveSubscription = false;
+//       _subscriptionStatus = 'خطا در اتصال';
+//     });
+//     return false;
+//   }
+// }
+
+/////////////
 //   // برای ذخیره chat_id
 // Future<void> saveChatId(String id) async {
 //   final prefs = await SharedPreferences.getInstance();
@@ -128,12 +519,20 @@ void initState() {
 //   });
 //   return id;
 // }
-
-  Future<void> incrementSentMessageCount() async {
-    final prefs = await SharedPreferences.getInstance();
+Future<void> resetSentMessageCount() async {
+  final prefs = await SharedPreferences.getInstance();
+  setState(() {
+    sentMessageCount = 0;
+    prefs.setInt('sentMessageCount', 0);
+  });
+}
+Future<void> incrementSentMessageCount() async {
+  final prefs = await SharedPreferences.getInstance();
+  setState(() {
     sentMessageCount++;
-    await prefs.setInt('sentMessageCount', sentMessageCount);
-  }
+    prefs.setInt('sentMessageCount', sentMessageCount);
+  });
+}
 
   Future<void> saveMessagesToLocal() async {
     final prefs = await SharedPreferences.getInstance();
@@ -171,20 +570,13 @@ void initState() {
             print('Error parsing message: $e');
           }
         }
-////////////////////////////////////////////////////////////////
-                      setState(() {
+
+        setState(() {
           messages = loadedMessages.where((m) => 
              m is types.Message && 
              (m is! types.TextMessage || m.text.trim().isNotEmpty)
            ).toList();
          });
-        /////////////////////////////////////////////////////////////////////////
-        // setState(() {
-        //   messages = loadedMessages;
-        //   loadedMessages.removeWhere((m) => m is! types.Message || (m is types.TextMessage && m.text.trim().isEmpty));
-
-        // });
-        
         WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
       } catch (e) {
         print('Error loading messages: $e');
@@ -235,7 +627,12 @@ Start answering now.
       if (messageText.isEmpty) return;
 
       if (loading) return;
-
+  // بررسی وضعیت اشتراک
+  final hasSubscription = await checkUserHasSubscription();
+      if (!hasSubscription && sentMessageCount >= maxFreeMessages) {
+        showUpgradeDialog();
+        return;
+      }
       if (sentMessageCount >= maxFreeMessages) {
         showUpgradeDialog();
         return;
@@ -255,6 +652,10 @@ Start answering now.
   });
     
     _scrollToBottom();
+      // فقط اگر اشتراک ندارد، تعداد پیام‌ها را افزایش دهید
+  if (!hasSubscription) {
+    await incrementSentMessageCount();
+  }
 
     final token = AuthService.getToken();
     if (token == null || token.isEmpty) {
@@ -296,10 +697,7 @@ Start answering now.
           chatResponse = lastItem['body'];
           chatId = lastItem['id']?.toString();
         }
-/////////////////////////////////////////////////////////////////////////////
         if (chatResponse != null ) {
-        // if (chatResponse != null ) {
-//////////////////////////////////////////////////////////////////////////////
           final botMessage = types.TextMessage(
             author: _bot,
             createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -310,15 +708,9 @@ Start answering now.
           setState(() {
             messages = [botMessage, ...messages];
           });
-///////////////////////////////////////////////////////////////////
-        //  await incrementSentMessageCount();
-         // await _saveMessagesToLocal();
-          //////////////////////////////////////////////////////////
           WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-
           await incrementSentMessageCount();
           await saveMessagesToLocal();
-
           await HistoryStorage.addItem(HistoryItem(
             imagePath: widget.imagePath,
             userMessage: cleaned.isNotEmpty ? cleaned : 'پیامی وارد نشده',
@@ -342,116 +734,6 @@ Start answering now.
     }
   }
 
-
-// Future<void> sendMessage({required String text}) async {
-//   final messageText = text.trim();
-//   if (messageText.isEmpty) return;
-//   if (loading) return;
-//   if (sentMessageCount >= maxFreeMessages) {
-//     showUpgradeDialog();
-//     return;
-//   }
-
-//   setState(() => loading = true);
-
-//   final userMessage = types.TextMessage(
-//     author: _user,
-//     createdAt: DateTime.now().millisecondsSinceEpoch,
-//     id: 'user_${DateTime.now().millisecondsSinceEpoch}',
-//     text: messageText,
-//   );
-
-//   setState(() {
-//     messages = [userMessage, ...messages];
-//   });
-  
-//   _scrollToBottom();
-
-//   final token = AuthService.getToken();
-//   if (token == null || token.isEmpty) {
-//     Navigator.pushReplacementNamed(context, '/login');
-//     return;
-//   }
-
-//   var url = Uri.parse('https://chat.vsrv.ir/api/chats?package_name=com.vada.drive');
-//   final cleaned = cleanOcrText(messageText);
-//   final prompt = buildPrompt(cleaned);
-
-//   try {
-//     var response = await http.post(
-//       url,
-//       headers: {
-//         'Accept': 'application/json',
-//         'Content-Type': 'application/json',
-//         'Authorization': 'Bearer $token',
-//         'package_name': 'com.vada.drive',
-//       },
-//       body: jsonEncode({
-//         'body': prompt,
-//         'title': 'آزمون آیلتس',
-//         'chat_id': chatId, // اضافه کردن chat_id به درخواست
-//       }),
-//     );
-
-//     if (response.statusCode == 200) {
-//       messageController.clear();
-//       var data = jsonDecode(response.body);
-
-//       String? chatResponse;
-//       String? newChatId;
-
-//       if (data is Map && data.containsKey('body')) {
-//         chatResponse = data['body'];
-//         newChatId = data['id']?.toString();
-//       } else if (data is List && data.isNotEmpty) {
-//         final lastItem = data.last;
-//         chatResponse = lastItem['body'];
-//         newChatId = lastItem['id']?.toString();
-//       }
-
-//       if (chatResponse != null) {
-//         final botMessage = types.TextMessage(
-//           author: _bot,
-//           createdAt: DateTime.now().millisecondsSinceEpoch,
-//           id: 'bot_${DateTime.now().millisecondsSinceEpoch}',
-//           text: chatResponse,
-//         );
-
-//         setState(() {
-//           messages = [botMessage, ...messages];
-//         });
-
-//         // اگر chat_id جدید دریافت شد، آن را ذخیره کنید
-//         if (newChatId != null && newChatId != chatId) {
-//           await saveChatId(newChatId);
-//         }
-
-//         await incrementSentMessageCount();
-//         await saveMessagesToLocal();
-
-//         await HistoryStorage.addItem(HistoryItem(
-//           imagePath: widget.imagePath,
-//           userMessage: cleaned.isNotEmpty ? cleaned : 'پیامی وارد نشده',
-//           chatResponse: chatResponse.isNotEmpty ? chatResponse : 'بدون پاسخ',
-//           chatId: newChatId ?? chatId ?? '', 
-//           time: '',
-//         ));
-//       }
-//     } else {
-//       var errorData = jsonDecode(response.body);
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(errorData['message'] ?? 'ارسال پیام ناموفق بود')),
-//       );
-//     }
-//   } catch (e) {
-//     print('Error sending message: $e');
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(content: Text('خطا در ارسال پیام')),
-//     );
-//   } finally {
-//     setState(() => loading = false);
-//   }
-// }
 bool isRtlText(String text) {
   // تشخیص متن فارسی/عربی بر اساس محدوده Unicode
   final rtlRegex = RegExp(r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]');
@@ -462,85 +744,267 @@ bool isRtlText(String text) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('محدودیت پیام'),
-        content: Text('شما به حداکثر تعداد پیام رایگان رسیدید. برای ادامه لطفاً اشتراک تهیه کنید.'),
+        title: Text('محدودیت پیام',style: TextStyle(fontFamily: 'Kalameh'),),
+        content: Text('شما به حداکثر تعداد پیام رایگان رسیدید. برای ادامه لطفاً اشتراک تهیه کنید.',style: TextStyle(fontFamily: 'Kalameh'),),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('انصراف'),
+            child: Text('انصراف',style: TextStyle(color: Colors.black,fontFamily: 'Kalameh'),),
           ),
           ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2E7D32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 12),
+                ),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/subscription');
+                showSubscriptionPlans();
+             
             },
-            child: Text('خرید اشتراک'),
+            child: Text('خرید اشتراک',style: TextStyle(color: Colors.black,fontFamily: 'Kalameh'),),
           ),
         ],
       ),
     );
   }
-  void showRemainingMessagesDialog() {
-  final remaining = maxFreeMessages - sentMessageCount;
+  
+  Future<void> showSubscriptionPlans() async {
+  final hasSubscription = await checkUserHasSubscription();
+  if (hasSubscription) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('شما هم اکنون اشتراک فعال دارید')),
+    );
+    return;
+  }
+
+  final plans = await fetchSubscriptionPlans();
+  if (plans.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('دریافت لیست اشتراک‌ها با خطا مواجه شد')),
+    );
+    return;
+  }
+     showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black54,
+    transitionAnimationController: AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync:Scaffold.of(context) ,
+    ),
+    builder: (context) => GestureDetector(
+      onTap: () {}, // جلوگیری از بسته شدن با کلیک روی محتوا
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Color(0xFFF1F8E9),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                spreadRadius: 5,
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle
+              Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // Title
+              Text(
+              'برای استفاده از امکانات برنامه باید اشتراک تهیه بکنید ',   
+                style: TextStyle( fontFamily: 'Kalameh',
+                    fontSize: 14,
+                    color: Colors.black,),
+                            ),
+              const SizedBox(height: 16),
+              
+              // Plans List
+              ...plans.map((plan) => AnimatedPlanCard(
+                plan: plan,
+                onTap: () => initiatePurchaseAndPay(plan['id']),
+              )).toList(),
+              
+              const SizedBox(height: 16),
+                          ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+//
+
+Future<void> initiatePurchaseAndPay(int productId) async {
+  try {
+    final paymentUrl = await initiatePurchase(productId: productId);
+    if (paymentUrl == null) throw 'خطا در دریافت درگاه پرداخت';
+
+    final paymentSuccess = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PaymentWebView(
+          paymentUrl: paymentUrl,
+          callbackUrlScheme: 'ielts',
+        ),
+      ),
+    );
+
+    if (paymentSuccess == true) {
+      // تاخیر برای اطمینان از ثبت پرداخت در سرور
+      await Future.delayed(Duration(seconds: 2));
+      
+      // بررسی مجدد وضعیت اشتراک
+      final hasSubscription = await checkSubscriptionStatus();
+      
+      if (hasSubscription) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('اشتراک با موفقیت فعال شد!')),
+        );
+      } else {
+        throw 'اشتراک فعال نشد. لطفاً چند دقیقه دیگر بررسی کنید';
+      }
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.toString())),
+    );
+  }
+}
+
+void showRemainingMessagesDialog() {
+  // محاسبه پیام‌های باقیمانده با مدیریت بهتر حالت‌ها
+  final remainingMessageText = _hasActiveSubscription
+      ? 'نامحدود'
+      : maxFreeMessages > sentMessageCount
+          ? '${maxFreeMessages - sentMessageCount} پیام باقیمانده'
+          : 'پیام رایگان تمام شده';
+
+  // استایل‌های مشترک
+  const titleStyle = TextStyle(
+    fontFamily: 'Kalameh',
+    fontWeight: FontWeight.bold,
+    fontSize: 18,
+  );
+
+  const contentStyle = TextStyle(
+    fontFamily: 'Kalameh',
+    fontSize: 16,
+    color: Colors.black87,
+  );
 
   showDialog(
     context: context,
     barrierDismissible: true,
-    builder: (_) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      backgroundColor: Colors.white,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.workspace_premium, color: Colors.amber, size: 28),
-          SizedBox(width: 8),
-          Text(
-            'اطلاعات اشتراک',
-            style: TextStyle(
-              fontFamily: 'Kalameh',
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+    builder: (context) => Directionality(
+      textDirection: TextDirection.rtl, // جهت متن راست به چپ
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        backgroundColor:Color(0xFFF1F8E9),
+        title: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.workspace_premium, 
+                  color: Colors.green, 
+                  size: 28),
+              const SizedBox(width: 8),
+              const Text('اطلاعات اشتراک', style: titleStyle),
+            ],
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _hasActiveSubscription 
+                  ? Icons.check_circle 
+                  : maxFreeMessages > sentMessageCount 
+                      ? Icons.info 
+                      : Icons.error_outline,
+              color: _hasActiveSubscription
+                  ? Colors.green  
+                  : maxFreeMessages > sentMessageCount
+                      ? const Color.fromARGB(255, 5, 145, 77)
+                      : Color.fromARGB(255, 3, 104, 55),
+              size: 48,
             ),
-          ),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            remaining > 0 ? Icons.check_circle : Icons.block,
-            color: remaining > 0 ? Colors.green : Colors.red,
-            size: 48,
-          ),
-          SizedBox(height: 16),
-          Text(
-            remaining > 0
-                ? 'شما $remaining پیام رایگان دیگر دارید'
-                : 'پیام‌های رایگان شما تمام شده است.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'Kalameh',
-              fontSize: 16,
-              color: Colors.black87,
+            const SizedBox(height: 16),
+            Text(
+              _hasActiveSubscription
+                  ? 'شما اشتراک فعال دارید و می‌توانید بدون محدودیت پیام ارسال کنید'
+                  : maxFreeMessages > sentMessageCount
+                      ? 'تعداد پیام‌های رایگان باقیمانده: $remainingMessageText'
+                      : 'پیام‌های رایگان شما تمام شده است\nبرای ادامه می‌توانید اشتراک تهیه کنید',
+              textAlign: TextAlign.center,
+              style: contentStyle,
             ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Center(
-            child: Text(
-              'باشه',
+            if (!_hasActiveSubscription) ...[
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2E7D32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 12),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                showSubscriptionPlans();
+                },
+                child: const Text(
+                  'خرید اشتراک',
+                  style: TextStyle(
+                    fontFamily: 'Kalameh',
+                    // fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'متوجه شدم',
               style: TextStyle(
                 fontFamily: 'Kalameh',
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: Color(0xFF2E7D32),
+                // fontWeight: FontWeight.bold,
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
@@ -563,37 +1027,68 @@ bool isRtlText(String text) {
         child: Scaffold(
           // drawer: Container(color: Colors.green,),
           // backgroundColor: Colors.green,
-          appBar: AppBar(
-            //  systemOverlayStyle: SystemUiOverlayStyle(
-            //   statusBarColor: Colors.green.shade50,
-            //   statusBarIconBrightness: Brightness.dark,
-            // ),
-            
-            //   leading: IconButton(
-            //   icon: Icon(Icons.arrow_back),
-            //   onPressed: () {
-            //     Navigator.pop(context);
-            //   },
-            // ),
-            automaticallyImplyLeading: false,
-            title: Center(child: Text("چت", style: TextStyle(fontFamily: 'Kalameh',color: Colors.white,fontWeight: FontWeight.w500))),
-            backgroundColor:Color(0xFF2E7D32),
-            actions: [
-              
-              // IconButton(
-              //   icon: Icon(Icons.logout),
-              //   onPressed: () async {
-              //     await AuthService.clearToken();
-              //     Navigator.pushReplacementNamed(context, '/login');
-              //   },
-              // ),
-              IconButton(
-                icon: Icon(Icons.workspace_premium,color: Colors.white,),
-                tooltip: 'اطلاعات اشتراک',
-                onPressed: showRemainingMessagesDialog,
+appBar: AppBar(
+  backgroundColor: Color(0xFF2E7D32),
+  automaticallyImplyLeading: false,
+  // backgroundColor: const Color(0xFF2E7D32),
+  // systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+  //   statusBarColor: const Color(0xFF2E7D32),
+  // ),
+  title: Container(
+    width: double.infinity, // عرض کامل
+    child: Stack(
+      alignment: Alignment.center, // تراز وسط اصلی
+      children: [
+        // وضعیت اشتراک (سمت راست)
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: _hasActiveSubscription 
+                  ? Color.fromARGB(255, 37, 100, 40)
+                  : const Color(0xFF2E7D32),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              _hasActiveSubscription ? 'اشتراک فعال' : 'بدون اشتراک',
+              style: const TextStyle(
+                fontSize: 14,
+                fontFamily: 'Kalameh',
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
               ),
-            ],
+            ),
           ),
+        ),
+        
+        // عنوان دقیقاً وسط
+        const Text(
+          "چت",
+          style: TextStyle(
+            fontFamily: 'Kalameh',
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+          ),
+        ),
+        
+        // آیکون اشتراک (سمت چپ)
+        Align(
+          alignment: Alignment.centerRight,
+          child: IconButton(
+            icon: const Icon(Icons.workspace_premium, size: 24),
+            color: Colors.white,
+            onPressed: showRemainingMessagesDialog,
+          ),
+        ),
+      ],
+    ),
+  ),
+  elevation: 0,
+  centerTitle: false,
+   // غیرفعال کردن centerTitle پیشفرض
+),
           body: SafeArea(
             child: Stack(
               children: [
@@ -670,13 +1165,13 @@ bool isRtlText(String text) {
                                     onChanged: (text) {
                                       setState(() {}); // برای به روزرسانی جهت متن
                                     },
-                                                                  ),
+                                    ),
                                   ),
                                 ),
                                 SizedBox(width: 8),
                                 IconButton(
                                   icon: Icon(Icons.document_scanner),
-                                  color: Colors.green,
+                                  color: Color(0xFF2E7D32),
                                   tooltip: 'ارسال متن از عکس یا PDF',
                                   onPressed: () async {
                                     final extractedText = await Navigator.push<String>(
@@ -705,7 +1200,7 @@ bool isRtlText(String text) {
                                           sendMessage(text: messageController.text);
                                          },
                                    style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: Color(0xFF2E7D32),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
                                   ),
@@ -738,7 +1233,7 @@ bool isRtlText(String text) {
                           ,
                           child: FloatingActionButton(
                             // mini: true,
-                            backgroundColor: Colors.green,
+                            backgroundColor: Color(0xFF2E7D32),
                             child: Icon(Icons.arrow_downward, color: Colors.white),
                             onPressed: _scrollToBottom,
                           ),
@@ -811,6 +1306,7 @@ Widget _buildBottomNavigationBar(BuildContext context) {
       ),
     ),
   );
+  
 }
 
 class _BottomNavItem extends StatelessWidget {
