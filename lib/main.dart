@@ -4,107 +4,68 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:otpuivada/UserInfoPage.dart';
 import 'otp_login_page.dart';
 import 'ocrpdf.dart';
-import 'package:flutter_localizations/flutter_localizations.dart'; // ✅ برای فارسی‌سازی
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-// --- اضافه کردن رنگ‌ها ---
-const Color primaryColor = Color(0xff794CFF);
-const Color primaryVariantColor = Color(0xff5C0AFF);
-const Color secondaryTextColor = Color(0xffAFBED0);
-const Color normalPriority = Color(0xffF09819);
-const Color lowPriority = Color(0xff3BE1F1);
-const Color highPriority = primaryColor;
+// رنگ‌های برنامه
+const Color primaryColor = Color(0xFF2E7D32); // تغییر به رنگ سبز اصلی شما
+const Color primaryVariantColor = Color(0xFF5C0AFF);
+const Color secondaryTextColor = Color(0xFFAFBED0);
 
-const taskBoxName = 'tasks';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // تنظیمات سیستم
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Color(0xFF2E7D32),
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+  
+    await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   await Hive.initFlutter();
   await Hive.openBox<String>('auth');
   await Hive.openBox<String>('imageHistory');
 
-  // حذف این بخش یا تنظیم مشابه AppBarTheme
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      statusBarColor: Color(0xFF2E7D32),
-      statusBarIconBrightness: Brightness.light,
-    ),
-  );
-
   runApp(const MyApp());
 }
-
-
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized(); 
-//   // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-//   // SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
-
-//   await Hive.initFlutter();
-//   await Hive.openBox<String>('auth');
-//   await Hive.openBox<String>('imageHistory');
-//   //  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-//   SystemChrome.setSystemUIOverlayStyle(
-//     SystemUiOverlayStyle(
-//       statusBarColor: Colors.green.shade50, // اینجا رنگ Status Bar
-//       statusBarIconBrightness: Brightness.light, // آیکن‌های سفید
-//     ),
-//   );
-
-//   runApp(const MyApp());
-// }
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-
-//   // فقط status bar بالا رو نگه می‌داریم، نوار پایین حذف می‌شه
-//   SystemChrome.setEnabledSystemUIMode(
-//     SystemUiMode.manual,
-//     overlays: [SystemUiOverlay.top],
-//   );
-
-//   await Hive.initFlutter();
-//   await Hive.openBox<String>('auth');
-//   await Hive.openBox<String>('imageHistory');
-
-//   SystemChrome.setSystemUIOverlayStyle(
-//     SystemUiOverlayStyle(
-//       statusBarColor: Colors.green.shade50, // رنگ Status Bar بالا
-//       statusBarIconBrightness: Brightness.dark, // آیکن‌ها تیره (برای پس‌زمینه روشن)
-//     ),
-//   );
-
-//   runApp(const MyApp());
-// }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   Future<bool> checkToken() async {
-    var box = Hive.box<String>('auth');
-    var token = box.get('token');
-    return token != null;
+    final box = Hive.box<String>('auth');
+    return box.get('token') != null;
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'پردازش OCR',
       theme: ThemeData(
-        appBarTheme: AppBarTheme(
-  backgroundColor: Colors.green.shade50,
-  systemOverlayStyle: SystemUiOverlayStyle(
-    statusBarColor: Colors.green.shade50,
-    statusBarIconBrightness: Brightness.dark,
-  ),
-),
-
-          fontFamily: 'Kalameh',
-          //  bodyMedium: TextStyle(fontSize: 14),
-      // headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          textTheme: const TextTheme(
-            
-          headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xff1D2830)),
+        primaryColor: const Color(0xFF2E7D32), // رنگ اصلی
+        primarySwatch: Colors.green,
+        fontFamily: 'Kalameh',
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF2E7D32), // فقط از backgroundColor استفاده کنید
+          elevation: 0,
+          centerTitle: true,
+          // systemOverlayStyle: SystemUiOverlayStyle(
+          //   statusBarColor: Color(0xFF2E7D32),
+          //   statusBarBrightness: Brightness.light,
+          //   statusBarIconBrightness: Brightness.light,
+          // ),
+        ),
+        textTheme: const TextTheme(
+          headlineSmall: TextStyle(
+            fontSize: 24, 
+            fontWeight: FontWeight.bold, 
+            color: Color(0xFF1D2830)),
           bodyMedium: TextStyle(fontSize: 14),
         ),
         inputDecorationTheme: const InputDecorationTheme(
@@ -113,40 +74,31 @@ class MyApp extends StatelessWidget {
           border: InputBorder.none,
           iconColor: secondaryTextColor,
         ),
-        colorScheme: const ColorScheme.light(
-          primary: primaryColor,
-          onPrimaryFixed: primaryVariantColor,
-          background: Color(0xffF3F5F8),
-          onSurface: Color(0xff1D2830),
+        colorScheme: ColorScheme.light(
+          primary: const Color(0xFF2E7D32), // هماهنگ با رنگ اصلی
+          secondary: const Color(0xFF2E7D32),
+          background: const Color(0xFFF3F5F8),
           onPrimary: Colors.white,
-          onBackground: Color(0xff1D2830),
-          secondary: primaryColor,
-          onSecondary: Colors.white,
+          onSurface: const Color(0xFF1D2830),
         ),
+        scaffoldBackgroundColor: const Color(0xFFF1F8E9),
       ),
-
-      // ✅ تنظیمات لازم برای راست‌چین شدن کل اپ
-      locale: const Locale('fa'), // زبان پیش‌فرض فارسی
-      supportedLocales: const [
-        Locale('fa'), // لیست زبان‌های پشتیبانی‌شده
-      ],
+      locale: const Locale('fa'),
+      supportedLocales: const [Locale('fa')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-
       home: FutureBuilder<bool>(
         future: checkToken(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return SafeArea(child: const Scaffold(body: Center(child: CircularProgressIndicator())));
-          } else if (snapshot.hasData && snapshot.data == true) {
-            return OCRPdfApp();
-            // bottomNavigationBar: _buildBottomNavigationBar()
-          } else {
-            return OtpLoginPage();
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
           }
+          return snapshot.data == true ? OCRPdfApp() : OtpLoginPage();
         },
       ),
       routes: {
@@ -157,4 +109,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

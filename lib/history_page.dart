@@ -224,51 +224,6 @@ String _twoDigits(int n) => n.toString().padLeft(2, '0');
                         ),
                       ],
                     ),
-                    // child: Column(
-                    //   crossAxisAlignment: CrossAxisAlignment.start,
-                    //   children: [
-                    //     // Text(
-                    //     //   'تاریخ و زمان:',
-                    //     //   style: TextStyle(
-                    //     //     fontFamily: 'Vazir',
-                    //     //     fontWeight: FontWeight.bold,
-                    //     //     color: textColor.withOpacity(0.8),
-                    //     //   ), ),
-                    //     //   Text(
-                    //     //       formatDate(item.time), // این خط تاریخ را نمایش می‌دهد
-                    //     //       style: TextStyle(color: Colors.grey, fontSize: 12),
-                    //     //     ),
-          
-                    //           //    Text(
-                    //           //   formatDate(item.time), // نمایش تاریخ و ساعت
-                    //           //   style: TextStyle(color: Colors.grey, fontSize: 12),
-                    //           // ),
-                    //     // ),
-                    //     // Text(
-                    //     //   '',
-                    //     //   dateFormat.format(DateTime.parse(item.timestamp)),
-                    //     //   style: TextStyle(
-                    //     //     fontFamily: 'Vazir',
-                    //     //     color: textColor.withOpacity(0.6),
-                    //     //   ),
-                    //     // ),
-                    //     // const SizedBox(height: 12),
-                    //     // Text(
-                    //     //   'شناسه چت:',
-                    //     //   style: TextStyle(
-                    //     //     fontFamily: 'Vazir',
-                    //     //     fontWeight: FontWeight.bold,
-                    //     //     color: textColor.withOpacity(0.8),
-                    //     //   ),
-                    //     // ),
-                    //     // Text(
-                    //     //   item.chatId,
-                    //     //   style: TextStyle(
-                    //     //     fontFamily: 'Vazir',
-                    //     //     color: textColor.withOpacity(0.6),
-                    //     //   ),
-                    //     // ),
-                    //   ],
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -279,21 +234,6 @@ String _twoDigits(int n) => n.toString().padLeft(2, '0');
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                        //  Text(
-                        //   'شناسه چت:',
-                        //   style: TextStyle(
-                        //     fontFamily: 'Vazir',
-                        //     fontWeight: FontWeight.bold,
-                        //     color: textColor.withOpacity(0.8),
-                        //   ),
-                        // ),
-                        // Text(
-                        //   item.chatId,
-                        //   style: TextStyle(
-                        //     fontFamily: 'Vazir',
-                        //     color: textColor.withOpacity(0.6),
-                        //   ),
-                        // ),
                           Container(
                             padding: const EdgeInsets.all(16),
                             // color: Colors.blue,
@@ -600,7 +540,8 @@ String _twoDigits(int n) => n.toString().padLeft(2, '0');
           //   statusBarColor: Colors.green.shade50,
           //   statusBarIconBrightness: Brightness.dark,
           // ),
-          title: const Text('تاریخچه پردازش‌ها', style: TextStyle(fontFamily: 'Kalameh')),
+          title: const Text('تاریخچه پردازش‌ها', style: TextStyle(fontFamily: 'Kalameh',color: Colors.white,fontSize: 14
+          )),
           backgroundColor: primaryColor,
           centerTitle: true,
           // shape: const RoundedRectangleBorder(

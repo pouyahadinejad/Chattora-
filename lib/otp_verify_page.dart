@@ -286,13 +286,10 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-  //            systemOverlayStyle: SystemUiOverlayStyle(
-  //   statusBarColor: Colors.green.shade50,
-  //   statusBarIconBrightness: Brightness.dark,
-  // ),
+
             automaticallyImplyLeading: false,
         
-            backgroundColor: Colors.green,
+            backgroundColor: Color(0xFF2E7D32),
           ),
           body: SafeArea(
             child: SingleChildScrollView(
@@ -363,7 +360,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
                                         'ارسال مجدد کد',
                                         style: TextStyle(
                                           fontFamily: 'Kalameh',
-                                          color: Colors.green,
+                                          color: Color(0xFF2E7D32),
                                           fontSize: 14,
                                         ),
                                       ),
@@ -386,11 +383,11 @@ class _OtpVerifyPageState extends State<OtpVerifyPage>
                                         backgroundColor: Colors.green,
                                         elevation: 8,
                                         shadowColor:
-                                            Colors.greenAccent.withOpacity(0.5),
+                                            Color(0xFF2E7D32),
                                         disabledForegroundColor:
                                             Colors.white.withOpacity(0.5),
                                         disabledBackgroundColor:
-                                            Colors.green.withOpacity(0.3),
+                                            Color(0xFF2E7D32),
                                       ),
                                       child: loading
                                           ? SizedBox(

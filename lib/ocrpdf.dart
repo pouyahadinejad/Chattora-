@@ -28,11 +28,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'OCR پردازشگر',
       theme: ThemeData(
-        
         primarySwatch: Colors.green,
         fontFamily: 'Kalameh',
         scaffoldBackgroundColor: const Color(0xFFF1F8E9),
         appBarTheme: const AppBarTheme(
+          iconTheme: const IconThemeData(color: Colors.white),
+          backgroundColor: Color(0xFF2E7D32),
           elevation: 4,
           centerTitle: true,
           shape: RoundedRectangleBorder(
@@ -135,7 +136,7 @@ Widget _buildCurrentPage() {
             style: TextStyle(
               fontFamily: 'Kalameh',
               color: primaryColor,
-              fontSize: 16,
+              fontSize: 14,
             ),
           ),
         ],
@@ -154,7 +155,7 @@ Widget _buildCurrentPage() {
               Hive.box<String>('auth').get('last_name') ?? '---',
             ),
             SizedBox(
-               height: MediaQuery.of(context).size.height * 0.5,
+               height: MediaQuery.of(context).size.height * 0.4,
               child: _buildUploadSection()),
           ],
         ),
@@ -317,7 +318,7 @@ Widget _buildBottomNavigationBar() {
                   'انتخاب منبع تصویر',
                   style: TextStyle(
                     fontFamily: 'Kalameh',
-                    fontSize: 16,
+                    fontSize: 14,
                     // fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
@@ -359,7 +360,7 @@ Widget _buildBottomNavigationBar() {
                     "انصراف",
                     style: TextStyle(
                       fontFamily: 'Kalameh',
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -392,7 +393,7 @@ Widget _buildOptionItem({
       title,
       style: const TextStyle(
         fontFamily: 'Kalameh',
-        fontSize: 16,
+        fontSize: 14,
       ),
     ),
     trailing: Icon(Icons.chevron_left, color: Colors.grey.shade400),
@@ -426,128 +427,179 @@ Future<void> _handleImageSelection(ImageSource source) async {
     ) ?? false;
   }
 
-
-  Widget _buildSidebar(BuildContext context, String fullName, Color primaryColor) {
+Widget _buildSidebar(BuildContext context, String fullName, Color primaryColor) {
   return SidebarX(
     controller: _sidebarController,
     theme: SidebarXTheme(
       width: 280,
-      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: primaryColor,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            primaryColor.withOpacity(0.9),
+            primaryColor.withOpacity(0.8),
+          ],
+        ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-            spreadRadius: 2,
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 15,
+            spreadRadius: 5,
           )
         ],
       ),
       hoverColor: Colors.white.withOpacity(0.2),
       textStyle: TextStyle(
         fontFamily: 'Kalameh',
-        color: Colors.white,
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
+        color: Colors.white.withOpacity(0.9),
+        fontSize: 15,
       ),
       selectedTextStyle: TextStyle(
         fontFamily: 'Kalameh',
         color: primaryColor,
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: FontWeight.bold,
       ),
-      itemTextPadding: const EdgeInsets.only(right: 16),
-      itemPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      itemTextPadding: const EdgeInsets.only(right: 20),
+      itemPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       selectedItemDecoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.95),
+            Colors.white.withOpacity(0.9),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            spreadRadius: 1,
+            blurRadius: 8,
+            spreadRadius: 2,
           )
         ],
       ),
-      iconTheme: IconThemeData(color: Colors.white, size: 22),
-      selectedIconTheme: IconThemeData(color: primaryColor, size: 22),
+      iconTheme: IconThemeData(
+        color: Colors.white.withOpacity(0.9),
+        size: 24,
+      ),
+      selectedIconTheme: IconThemeData(
+        color: primaryColor,
+        size: 24,
+      ),
     ),
     headerBuilder: (context, extended) {
       return Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: Colors.white.withOpacity(0.8), width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 10,
+                    spreadRadius: 3,
+                  )
+                ],
               ),
               child: CircleAvatar(
-                radius: 32,
+                radius: 36,
                 backgroundColor: Colors.white,
                 child: Icon(
                   Icons.account_circle, 
-                  size: 54, 
+                  size: 60, 
                   color: primaryColor,
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               'خوش آمدید',
               style: TextStyle(
                 fontFamily: 'Kalameh',
-                fontSize: 18,
+                fontSize: 16,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 5,
+                    offset: Offset(1, 1),
+                  )
+                ],
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Text(
               fullName,
               style: TextStyle(
                 fontFamily: 'Kalameh',
                 fontSize: 14,
                 color: Colors.white.withOpacity(0.9),
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 3,
+                    offset: Offset(1, 1),
+                  )
+                ],
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 15),
             Divider(
               color: Colors.white.withOpacity(0.3),
               thickness: 1,
-              indent: 20,
-              endIndent: 20,
+              indent: 30,
+              endIndent: 30,
+              height: 1,
             ),
           ],
         ),
       );
     },
+    footerBuilder: (context, extended) {
+      return Padding(
+        padding: const EdgeInsets.all(15),
+        child: Text(
+          'نسخه 1.0.0',
+          style: TextStyle(
+            fontFamily: 'Kalameh',
+            color: Colors.white.withOpacity(0.7),
+            fontSize: 12,
+          ),
+        ),
+      );
+    },
     items: [
       SidebarXItem(
-        icon: Icons.home_outlined,
+        icon: Icons.home_rounded,
         label: 'صفحه اصلی',
         onTap: () => Navigator.pop(context),
       ),
       SidebarXItem(
-        icon: Icons.chat_bubble_outline,
+        icon: Icons.chat_rounded,
         label: 'چت',
         onTap: () => _navigateWithFade(context, const ChatListPage(imagePath: '')),
       ),
       SidebarXItem(
-        icon: Icons.history_toggle_off,
+        icon: Icons.history_rounded,
         label: 'تاریخچه',
         onTap: () => _navigateWithFade(context, const HistoryPage()),
       ),
-      const SidebarXItem(
-        icon: Icons.settings_outlined,
+      SidebarXItem(
+        icon: Icons.settings_rounded,
         label: 'تنظیمات',
       ),
-      SidebarXItem(
-        icon: Icons.logout,
+      SidebarXItem( 
+        icon: Icons.logout_rounded,
         label: 'خروج',
         onTap: () => _showLogoutConfirmation(context),
       ),
@@ -600,45 +652,84 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
     );
   }
 }
-
-  Widget _buildUserInfoCard(String mobileNumber, String firstName, String lastName) {
-    return Container(
+Widget _buildUserInfoCard(String mobileNumber, String firstName, String lastName) {
+  return TweenAnimationBuilder(
+    duration: const Duration(milliseconds: 500),
+    tween: Tween<double>(begin: 0, end: 1),
+    builder: (context, value, child) {
+      return Transform.scale(
+        scale: value,
+        child: Opacity(
+          opacity: value,
+          child: child,
+        ),
+      );
+    },
+    child: Container(
       width: double.infinity,
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            cardColor.withOpacity(0.9),
+            cardColor.withOpacity(0.7),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 15,
+            spreadRadius: 1,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'پروفایل کاربری',
-            style: TextStyle(
-              fontFamily: 'Kalameh',
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: primaryColor,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'پروفایل کاربری',
+                style: TextStyle(
+                  fontFamily: 'Kalameh',
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.person, color: primaryColor, size: 18),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          _buildInfoRow(Icons.phone_android, 'شماره موبایل: $mobileNumber'),
-          const Divider(height: 20, thickness: 0.5),
-          _buildInfoRow(Icons.person, 'نام: $firstName'),
-          const Divider(height: 20, thickness: 0.5),
-          _buildInfoRow(Icons.person_outline, 'نام خانوادگی: $lastName'),
+          const SizedBox(height: 16),
+          _buildAnimatedInfoRow(Icons.phone_android, 'شماره موبایل', mobileNumber),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Divider(height: 1, thickness: 0.8),
+          ),
+          _buildAnimatedInfoRow(Icons.person, 'نام', firstName),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Divider(height: 1, thickness: 0.8),
+          ),
+          _buildAnimatedInfoRow(Icons.person_outline, 'نام خانوادگی', lastName),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildUploadSection() {
     return Expanded(
@@ -686,7 +777,7 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
                     'برای آپلود تصویر کلیک کنید',
                     style: TextStyle(
                       fontFamily: 'Kalameh',
-                      fontSize: 16,
+                      fontSize: 14,
                       color: textColor.withOpacity(0.8),
                     ),
                   ),
@@ -695,7 +786,7 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
                     'فرمت‌های پشتیبانی شده: JPG, PNG',
                     style: TextStyle(
                       fontFamily: 'Kalameh',
-                      fontSize: 12,
+                      fontSize: 14,
                       color: Colors.grey.shade600,
                     ),
                   ),
@@ -708,18 +799,57 @@ Future<void> _showLogoutConfirmation(BuildContext context) async {
     );
   }
    
-  Widget _buildInfoRow(IconData icon, String text) {
-    return Row(
+Widget _buildAnimatedInfoRow(IconData icon, String label, String value) {
+  return TweenAnimationBuilder(
+    duration: const Duration(milliseconds: 300),
+    tween: Tween<double>(begin: 0, end: 1),
+    builder: (context, val, child) {
+      return Opacity(
+        opacity: val,
+        child: Padding(
+          padding: EdgeInsets.only(left: val * 10),
+          child: child,
+        ),
+      );
+    },
+    child: Row(
       children: [
-        Icon(icon, color: primaryColor, size: 20),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: TextStyle(fontFamily: 'Kalameh', fontSize: 14, color: textColor),
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: primaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: primaryColor, size: 18),
+        ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Kalameh',
+                fontSize: 12,
+                color: textColor.withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'Kalameh',
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
+          ],
         ),
       ],
-    );
-  }
+    ),
+  );
+}
 
   @override
 Widget build(BuildContext context) {
@@ -735,38 +865,46 @@ Widget build(BuildContext context) {
       onWillPop: () => _showExitDialog(context),
       child: SafeArea(
         child: Scaffold(
+          
           drawer: _buildSidebar(context, fullName, primaryColor),
           backgroundColor: backgroundColor,
         
           // ✅ فقط وقتی صفحه OCR هست، AppBar نشون بده
           appBar: _currentIndex  == 0
         ? AppBar(
-  //          systemOverlayStyle: SystemUiOverlayStyle(
-  //   statusBarColor: Colors.green.shade50,
-  //   statusBarIconBrightness: Brightness.dark,
-  // ),
+            iconTheme: const IconThemeData(color: Colors.white),
             automaticallyImplyLeading: true,
-            backgroundColor: primaryColor,
+            backgroundColor: const Color(0xFF2E7D32), // رنگ ثابت
             title: const Center(
               child: Text(
                 'پردازش OCR',
                 style: TextStyle(
                   fontFamily: 'Kalameh',
-                  color: Colors.black,
+                  color: Colors.white,
+                  fontSize: 16
                   // fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+                    systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Color(0xFF2E7D32), // رنگ ثابت برای status bar
+          statusBarIconBrightness: Brightness.light,
+        ),
+          elevation: 0, // حذف سایه
+          
             actions: [
               IconButton(
                 icon: const Icon(Icons.history, size: 28, color: Colors.transparent),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HistoryPage()),
-                ),
+              onPressed: () {},
               ),
             ],
-          )
+          
+           flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF2E7D32), // رنگ ثابت
+          ),
+        ),
+      )
         : null, // ❌ برای صفحات دیگه AppBar نداشته باش
         
           body: _buildCurrentPage(),
@@ -790,15 +928,11 @@ class ExtractedTextPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          
-  //          systemOverlayStyle: SystemUiOverlayStyle(
-  //   statusBarColor: Colors.green.shade50,
-  //   statusBarIconBrightness: Brightness.dark,
-  // ),
+                appBar: AppBar(
+          iconTheme: const IconThemeData(color: Colors.white),
           automaticallyImplyLeading :false,
-          title: Center(child: const Text('متن استخراج‌شده', style: TextStyle(fontFamily: 'Kalameh'))),
-          backgroundColor: Colors.green,
+          title: Center(child: const Text('متن استخراج‌شده', style: TextStyle(fontFamily: 'Kalameh',fontSize: 14))),
+          backgroundColor: Color(0xFF2E7D32),
         ),
         body: _ExtractedTextBody(text: text, imagePath: imagePath),
       ),
@@ -848,7 +982,7 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
                       widget.text,
                       style: TextStyle(
                         fontFamily: 'Kalameh',
-                        fontSize: 16,
+                        fontSize: 14,
                         height: 1.8,
                       ),
                     ),
@@ -874,7 +1008,7 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         // backgroundColor: Colors.green.withOpacity(0.6),
-                        backgroundColor: Colors.green,
+                        backgroundColor: Color(0xFF2E7D32),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -910,7 +1044,7 @@ class _ExtractedTextBodyState extends State<_ExtractedTextBody> {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: Color(0xFF2E7D32),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -977,26 +1111,35 @@ class _EditTextPageState extends State<EditTextPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-  //          systemOverlayStyle: SystemUiOverlayStyle(
-  //   statusBarColor: Colors.green.shade50,
-  //   statusBarIconBrightness: Brightness.dark,
-  // ),
-          title: Center(child: const Text('ویرایش متن', style: TextStyle(fontFamily: 'Kalameh'))),
-          backgroundColor: Colors.green,
-          automaticallyImplyLeading: false,
-          // shape: const RoundedRectangleBorder(
-          //   borderRadius: BorderRadius.vertical(
-          //     bottom: Radius.circular(20),
-          //   ),
-          // ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => Navigator.pop(context),
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: const Color(0xFF2E7D32),
+        automaticallyImplyLeading: false,
+        title: Stack(
+          alignment: Alignment.center,
+          children: [
+            // متن وسط
+            const Align(
+              alignment: Alignment.center,
+              child: Text(
+                'ویرایش متن',
+                style: TextStyle(
+                  fontFamily: 'Kalameh',
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            // آیکون سمت چپ (در راست‌به‌چپ = اولین عنصر سمت راست)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
           ],
         ),
+      ),
         body: Column(
           children: [
             Expanded(
@@ -1028,7 +1171,7 @@ class _EditTextPageState extends State<EditTextPage> {
                       ),
                       style: TextStyle(
                         fontFamily: 'Kalameh',
-                        fontSize: 16,
+                        fontSize: 14,
                         height: 1.8,
                       ),
                     ),
@@ -1052,7 +1195,7 @@ class _EditTextPageState extends State<EditTextPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Color(0xFF2E7D32),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

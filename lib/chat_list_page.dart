@@ -1014,6 +1014,12 @@ void showRemainingMessagesDialog() {
   Widget build(BuildContext context) {
      _context = context;  // ذخیره context
        final hasParentNavigation = context.findAncestorWidgetOfExactType<Scaffold>()?.bottomNavigationBar != null;
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Theme.of(context).appBarTheme.backgroundColor,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
   return WillPopScope(
     onWillPop: () async {
       // وقتی کاربر دکمه بازگشت را میزند، به صفحه اصلی برمی‌گردد
@@ -1024,226 +1030,230 @@ void showRemainingMessagesDialog() {
       return false;
     },
       child: SafeArea(
-        child: Scaffold(
-          // drawer: Container(color: Colors.green,),
-          // backgroundColor: Colors.green,
-appBar: AppBar(
-  backgroundColor: Color(0xFF2E7D32),
-  automaticallyImplyLeading: false,
-  // backgroundColor: const Color(0xFF2E7D32),
-  // systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
-  //   statusBarColor: const Color(0xFF2E7D32),
-  // ),
-  title: Container(
-    width: double.infinity, // عرض کامل
-    child: Stack(
-      alignment: Alignment.center, // تراز وسط اصلی
-      children: [
-        // وضعیت اشتراک (سمت راست)
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: _hasActiveSubscription 
-                  ? Color.fromARGB(255, 37, 100, 40)
-                  : const Color(0xFF2E7D32),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              _hasActiveSubscription ? 'اشتراک فعال' : 'بدون اشتراک',
-              style: const TextStyle(
-                fontSize: 14,
-                fontFamily: 'Kalameh',
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: Scaffold(
+            // drawer: Container(color: Colors.green,),
+            // backgroundColor: Colors.green,
+          appBar: AppBar(
+             backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            // backgroundColor: Color(0xFF2E7D32),
+            automaticallyImplyLeading: false,
+            // backgroundColor: const Color(0xFF2E7D32),
+            // systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+            //   statusBarColor: const Color(0xFF2E7D32),
+            // ),
+            title: Container(
+              width: double.infinity, // عرض کامل
+              child: Stack(
+                alignment: Alignment.center, // تراز وسط اصلی
+                children: [
+          // وضعیت اشتراک (سمت راست)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: _hasActiveSubscription 
+                    ? Color.fromARGB(255, 37, 100, 40)
+                    : const Color(0xFF2E7D32),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                _hasActiveSubscription ? 'اشتراک فعال' : 'بدون اشتراک',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Kalameh',
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
-        ),
-        
-        // عنوان دقیقاً وسط
-        const Text(
-          "چت",
-          style: TextStyle(
-            fontFamily: 'Kalameh',
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-          ),
-        ),
-        
-        // آیکون اشتراک (سمت چپ)
-        Align(
-          alignment: Alignment.centerRight,
-          child: IconButton(
-            icon: const Icon(Icons.workspace_premium, size: 24),
-            color: Colors.white,
-            onPressed: showRemainingMessagesDialog,
-          ),
-        ),
-      ],
-    ),
-  ),
-  elevation: 0,
-  centerTitle: false,
-   // غیرفعال کردن centerTitle پیشفرض
-),
-          body: SafeArea(
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    Expanded(
-                      child: Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: Chat(
-                          
-                          messages: messages,
-                             // messages: messages.reversed.toList(),
-                          onSendPressed: _handleSendPressed,
-                          user: _user,
-                          scrollController: _scrollController,
-                          scrollPhysics: const BouncingScrollPhysics(),
-                          theme: DefaultChatTheme(
-                            
-                            // fontFamily: 'Kalameh',
-                            primaryColor: Colors.green.withOpacity(0.2),
-                            secondaryColor: Colors.grey.withOpacity(0.2),
-                            inputBackgroundColor: Colors.white,
-                            inputTextColor: Colors.black,
-                            inputTextDecoration: InputDecoration(
-                              hintText: 'پیام خود را بنویسید...',
-                              hintStyle: TextStyle(fontFamily: 'Kalameh',fontSize: 14),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                            ),
-                            backgroundColor: Color(0xFFF1F8E9),
-                            receivedMessageBodyTextStyle: TextStyle(
-                              color: Colors.black,
-                              fontFamily: 'Kalameh',
-                              fontSize: 14,
-                            ),
-                            sentMessageBodyTextStyle: TextStyle(
-                              color: Colors.black,
-                              fontFamily: 'Kalameh',
-                              fontSize: 14,
-                            ),
-                            // receivedMessageBodyColor: Colors.grey.shade200,
-                            // sentMessageBodyColor: Colors.green,
-                            // borderRadius: 12,
-                          ),
-                          customBottomWidget: Container(
-                            color: Colors.white,
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Directionality(
-                                    textDirection: TextDirection.rtl,
-                                    child: TextField(
-                                    controller: messageController,
-                                    textDirection: messageController.text.isNotEmpty 
-                                        ? isRtlText(messageController.text) 
-                                          ? TextDirection.rtl 
-                                          : TextDirection.ltr
-                                        : null,
-                                    decoration: InputDecoration(
-                                      hintText: 'پیام خود را بنویسید...',
-                                      hintStyle: TextStyle(fontFamily: 'Kalameh', fontSize: 14),
-                                      filled: true,
-                                      fillColor: Colors.grey.shade100,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 14,
-                                      ),
-                                    ),
-                                    onChanged: (text) {
-                                      setState(() {}); // برای به روزرسانی جهت متن
-                                    },
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                IconButton(
-                                  icon: Icon(Icons.document_scanner),
-                                  color: Color(0xFF2E7D32),
-                                  tooltip: 'ارسال متن از عکس یا PDF',
-                                  onPressed: () async {
-                                    final extractedText = await Navigator.push<String>(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => OCRPdfApp()),
-                                    );
-                      
-                      
-                                      if (extractedText != null && extractedText.trim().isNotEmpty) {
-                                      // messageController.text = extractedText;
-                                       setState(() {
-                                        messageController.text = extractedText;
-                                         final ocrMessage = types.TextMessage(
-                                          author: _user,
-                                          createdAt: DateTime.now().millisecondsSinceEpoch,
-                                          id: 'ocr_${DateTime.now().millisecondsSinceEpoch}',
-                                          text: extractedText,
-                                        );
-                                        messages = [ocrMessage, ...messages];
-                                      });
-                                    }},),
-                                  ElevatedButton(
-                                   onPressed: loading
-                                      ? null
-                                      : () {
-                                          sendMessage(text: messageController.text);
-                                         },
-                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFF2E7D32),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  ),
-                                  child: loading
-                                      ? SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : Icon(Icons.send, color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-        
-                  ],
-                ),
-                      if (_showScrollToBottomButton)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 90,right: 18),
-                        // padding: EdgeInsets.all(80),
-                        child: Align(
-                          alignment: Alignment.bottomRight
-                          ,
-                          child: FloatingActionButton(
-                            // mini: true,
-                            backgroundColor: Color(0xFF2E7D32),
-                            child: Icon(Icons.arrow_downward, color: Colors.white),
-                            onPressed: _scrollToBottom,
-                          ),
-                        ),
-                      ),
-              ],
+          
+          // عنوان دقیقاً وسط
+          const Text(
+            "چت",
+            style: TextStyle(
+              fontFamily: 'Kalameh',
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
             ),
           ),
-            // اینجا BottomNavigationBar را اضافه می‌کنیم
-            bottomNavigationBar: hasParentNavigation ? null : _buildBottomNavigationBar(context),
+          
+          // آیکون اشتراک (سمت چپ)
+          Align(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              icon: const Icon(Icons.workspace_premium, size: 24),
+              color: Colors.white,
+              onPressed: showRemainingMessagesDialog,
+            ),
+          ),
+                ],
+              ),
+            ),
+            elevation: 0,
+            centerTitle: false,
+             // غیرفعال کردن centerTitle پیشفرض
+          ),
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  Column(
+                    children: [
+                      Expanded(
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Chat(
+                            
+                            messages: messages,
+                               // messages: messages.reversed.toList(),
+                            onSendPressed: _handleSendPressed,
+                            user: _user,
+                            scrollController: _scrollController,
+                            scrollPhysics: const BouncingScrollPhysics(),
+                            theme: DefaultChatTheme(
+                              
+                              // fontFamily: 'Kalameh',
+                              primaryColor: Colors.green.withOpacity(0.2),
+                              secondaryColor: Colors.grey.withOpacity(0.2),
+                              inputBackgroundColor: Colors.white,
+                              inputTextColor: Colors.black,
+                              inputTextDecoration: InputDecoration(
+                                hintText: 'پیام خود را بنویسید...',
+                                hintStyle: TextStyle(fontFamily: 'Kalameh',fontSize: 14),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                              backgroundColor: Color(0xFFF1F8E9),
+                              receivedMessageBodyTextStyle: TextStyle(
+                                color: Colors.black,
+                                fontFamily: 'Kalameh',
+                                fontSize: 14,
+                              ),
+                              sentMessageBodyTextStyle: TextStyle(
+                                color: Colors.black,
+                                fontFamily: 'Kalameh',
+                                fontSize: 14,
+                              ),
+                              // receivedMessageBodyColor: Colors.grey.shade200,
+                              // sentMessageBodyColor: Colors.green,
+                              // borderRadius: 12,
+                            ),
+                            customBottomWidget: Container(
+                              color: Colors.white,
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Directionality(
+                                      textDirection: TextDirection.rtl,
+                                      child: TextField(
+                                      controller: messageController,
+                                      textDirection: messageController.text.isNotEmpty 
+                                          ? isRtlText(messageController.text) 
+                                            ? TextDirection.rtl 
+                                            : TextDirection.ltr
+                                          : null,
+                                      decoration: InputDecoration(
+                                        hintText: 'پیام خود را بنویسید...',
+                                        hintStyle: TextStyle(fontFamily: 'Kalameh', fontSize: 14),
+                                        filled: true,
+                                        fillColor: Colors.grey.shade100,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 14,
+                                        ),
+                                      ),
+                                      onChanged: (text) {
+                                        setState(() {}); // برای به روزرسانی جهت متن
+                                      },
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  IconButton(
+                                    icon: Icon(Icons.document_scanner),
+                                    color: Color(0xFF2E7D32),
+                                    tooltip: 'ارسال متن از عکس یا PDF',
+                                    onPressed: () async {
+                                      final extractedText = await Navigator.push<String>(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => OCRPdfApp()),
+                                      );
+                        
+                        
+                                        if (extractedText != null && extractedText.trim().isNotEmpty) {
+                                        // messageController.text = extractedText;
+                                         setState(() {
+                                          messageController.text = extractedText;
+                                           final ocrMessage = types.TextMessage(
+                                            author: _user,
+                                            createdAt: DateTime.now().millisecondsSinceEpoch,
+                                            id: 'ocr_${DateTime.now().millisecondsSinceEpoch}',
+                                            text: extractedText,
+                                          );
+                                          messages = [ocrMessage, ...messages];
+                                        });
+                                      }},),
+                                    ElevatedButton(
+                                     onPressed: loading
+                                        ? null
+                                        : () {
+                                            sendMessage(text: messageController.text);
+                                           },
+                                     style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF2E7D32),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                    child: loading
+                                        ? SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : Icon(Icons.send, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+          
+                    ],
+                  ),
+                        if (_showScrollToBottomButton)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 90,right: 18),
+                          // padding: EdgeInsets.all(80),
+                          child: Align(
+                            alignment: Alignment.bottomRight
+                            ,
+                            child: FloatingActionButton(
+                              // mini: true,
+                              backgroundColor: Color(0xFF2E7D32),
+                              child: Icon(Icons.arrow_downward, color: Colors.white),
+                              onPressed: _scrollToBottom,
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+            ),
+              // اینجا BottomNavigationBar را اضافه می‌کنیم
+              bottomNavigationBar: hasParentNavigation ? null : _buildBottomNavigationBar(context),
+          ),
         ),
       ), 
     );
